@@ -7,7 +7,7 @@ class HCaptchaProxyless extends Uncaptcha{
 	protected $websiteUrl;
 	protected $websiteKey;
 
-	function genTaskPost(): array{
+	function genTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [

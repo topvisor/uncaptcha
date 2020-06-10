@@ -13,7 +13,7 @@ class ImageToText extends Uncaptcha{
 	private $maxLength = 0;
 	private $language = 0;
 
-	function genTaskPost(): array{
+	function genTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [

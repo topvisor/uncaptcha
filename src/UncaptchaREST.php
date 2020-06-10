@@ -2,7 +2,7 @@
 
 namespace Topvisor\Uncaptcha;
 
-class UncaptchaREST{
+trait UncaptchaREST{
 
 	private $timeout = 10;
 	private $curlResponse = NULL;
@@ -13,19 +13,23 @@ class UncaptchaREST{
 		$this->timeout = $timeout;
 	}
 
-	private function call(string $methodName, array $post = []): ?stdClass{
+	private function call(string $methodName, array $post = []): ?\stdClass{
 		if(!$this->host) throw new Exception('Please, set host');
 
 		$url = "$this->scheme://$this->host";
 
 		if($this->v == 1){
 			switch($methodName){
+				case 'getTest':
+					$url .= 'res.php';
 				case 'createTask':
 					$url .= '/in.php';
 
 					break;
 				case 'getTaskResult':
 					$url .= 'res.php?action=get';
+
+					break;
 
 					break;
 				default:
@@ -67,7 +71,7 @@ class UncaptchaREST{
 
 		$this->curlErrorMessage = curl_error($ch);
 		if($this->curlErrorMessage){
-			$this->curlErrorMessage .= ' ('.curl_errno($this->ch).')';
+			$this->curlErrorMessage .= ' ('.curl_errno($ch).')';
 
 			$this->debugMessage($this->curlErrorMessage);
 		}
@@ -76,7 +80,7 @@ class UncaptchaREST{
 
 		$this->curlResult = $this->genResult($this->curlResponse);
 		if($this->curlResult->errorId){
-			$this->setErrorMessage($this->curlResult->errorMessage.' ('.$this->curlResult->errorCode.')'.' ['.$this->curlResult->errorId.']');
+			$this->setErrorMessage($this->curlResult->errorDescription.' ('.$this->curlResult->errorCode.')'.' ['.$this->curlResult->errorId.']');
 		}
 
 		curl_close($ch);
@@ -88,10 +92,10 @@ class UncaptchaREST{
 		return $this->curlResult;
 	}
 
-	private function genResult(string $response): stdClass{
+	private function genResult(string $response): \stdClass{
 		$result = json_decode($response);
 
-		if(!$result) $result = new stdClass();
+		if(!$result) $result = new \stdClass();
 
 		if(!isset($result->response)) $result->response = NULL;
 		if(!isset($result->status)) $result->status = NULL;

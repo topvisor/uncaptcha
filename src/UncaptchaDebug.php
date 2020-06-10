@@ -2,7 +2,7 @@
 
 namespace Topvisor\Uncaptcha;
 
-class UncaptchaDebug{
+trait UncaptchaDebug{
 
 	private $debugEnabled = false;
 	private $debugIsCLI = NULL;

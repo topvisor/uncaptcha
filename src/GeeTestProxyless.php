@@ -9,7 +9,7 @@ class GeeTestProxyless extends Uncaptcha{
 	protected $websiteChallenge;
 	protected $geetestApiServerSubdomain;
 
-	function genTaskPost(): array{
+	function genTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [

@@ -52,10 +52,11 @@ class Uncaptcha{
 		switch($host){
 			case 'rucaptcha.com':
 				$this->referalId = 2708; // referer автора этой библиотеки
+				$this->v = 1;
 
 				break;
 			case 'api.anti-captcha.com':
-				$v = 2;
+				$this->v = 2;
 
 				break;
 		}
@@ -149,6 +150,13 @@ class Uncaptcha{
 		}
 	}
 
+	function getTest(): ?float{
+		$result = $this->call('test');
+		if(!$result) return $result;
+
+		return $result->response;
+	}
+
 	function getBalance(): ?float{
 		$result = $this->call('getBalance');
 		if(!$result) return $result;
@@ -156,11 +164,11 @@ class Uncaptcha{
 		return $result->response;
 	}
 
-	function getAppStats(): ?stdClass{
+	function getAppStats(): ?\stdClass{
 		return $this->call('getAppStats');
 	}
 
-	function getCMStatus(): ?stdClass{
+	function getCMStatus(): ?\stdClass{
 		return $this->call("getcmstatus?key=$this->clientKey");
 	}
 

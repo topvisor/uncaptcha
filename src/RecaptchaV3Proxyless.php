@@ -9,7 +9,7 @@ class RecaptchaV3Proxyless extends Uncaptcha{
 	protected $pageAction;
 	protected $minScore;
 
-	function genTaskPost(): array{
+	function genTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [

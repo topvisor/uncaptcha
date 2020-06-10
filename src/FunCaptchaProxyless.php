@@ -10,7 +10,7 @@ class FunCaptchaProxyless extends Uncaptcha{
 	protected $jsSubdomain;
 	protected $data = [];
 
-	function genTaskPost(): array{
+	function genTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [
