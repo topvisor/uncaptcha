@@ -1,0 +1,22 @@
+{
+	"name":"topvisor/uncaptcha",
+	"description":"Library for solve captcha by services",
+	"keywords":["PHP", "Uncaptcha", "Captcha", "reCaptcha 2", "reCaptcha 3", "FunCaptcha", "GeeTest", "hCaptcha", "Image captcha"],
+	"license":"MIT",
+	"type":"library",
+	"authors":[
+		{
+			"name":"Artemeey",
+			"email":"artemeey.ru@mail.ru"
+		}
+	],
+	"require":{
+		"php":"^7.3",
+		"ext-curl":"*"
+	},
+	"autoload":{
+		"psr-4":{
+			"Topvisor\\Uncaptcha\\":"src/"
+		}
+	}
+}
