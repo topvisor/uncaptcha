@@ -17,10 +17,16 @@ trait UncaptchaDebug{
 	function debugMessage(string $message): void{
 		if(!$this->debugEnabled) return;
 
+		$message .= "\n";
+		$message = preg_replace('~<br\s?/?>~', "\n", $message);
+
 		if($this->debugIsCLI){
-			$message = preg_replace('~<br\s?/?>~', "\n", $message);
 			$message = strip_tags($message);
+		}else{
+			$message = "<pre>$message</pre>";
 		}
+
+		echo $message;
 
 		$this->messages[] = $message;
 	}
