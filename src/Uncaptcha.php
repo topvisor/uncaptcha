@@ -18,21 +18,21 @@ class Uncaptcha{
 
 	const V = '1.3.2';
 
-	private $referalId = NULL;
-	private $scheme = 'https';
-	private $host = '';
-	private $clientKey = NULL;
-	private $v = NULL;
-	private $post = [];
-	private $proxy = [
+	protected $referalId = NULL;
+	protected $scheme = 'https';
+	protected $host = '';
+	protected $clientKey = NULL;
+	protected $v = NULL;
+	protected $post = [];
+	protected $proxy = [
 		'type' => 'http',
 		'server' => NULL,
 		'port' => NULL,
 		'login' => NULL,
 		'password' => NULL
 	];
-	private $userAgent = NULL;
-	private $cookies = NULL;
+	protected $userAgent = NULL;
+	protected $cookies = NULL;
 	private $taskId = 0;
 	private $taskTimeout = 240;
 	private $taskTimeoutElapsed = 0;
@@ -203,7 +203,7 @@ class Uncaptcha{
 		}
 
 		if($this->v == 2){
-			 $post['proxyType'] = $this->proxy['type'];
+			$post['proxyType'] = $this->proxy['type'];
 			if($this->proxy['login']) $post['proxyLogin'] = $this->proxy['login'];
 			if($this->proxy['password']) $post['proxyPassword'] = $this->proxy['password'];
 			if($this->proxy['server']) $post['proxyAddress'] = $this->proxy['server'];
