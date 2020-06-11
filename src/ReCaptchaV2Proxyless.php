@@ -69,7 +69,7 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 	function reportBad(): ?bool{
 		if(
 			$this->v == 1 or
-			md5($this->host) != '0529087a3e61e81284291fdaeec13a48'
+			$this->host != 'api.anti-captcha.com'
 		) return parent::reportBad();
 
 		if($this->v == 2){
