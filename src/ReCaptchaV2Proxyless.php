@@ -70,9 +70,9 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 		if($this->v == 1) return parent::reportBad();
 
 		if($this->v == 2){
-			if(!$this->taskid) throw new Exception('Task does not exists');
+			if(!$this->taskId) throw new Exception('Task does not exists');
 
-			return $this->call('reportIncorrectRecaptcha', ['taskId' => $this->taskid]);
+			return $this->call('reportIncorrectRecaptcha', ['taskId' => $this->taskId]);
 		}
 	}
 

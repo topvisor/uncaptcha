@@ -166,21 +166,21 @@ class Uncaptcha{
 	}
 
 	function reportBad(){
-		if(!$this->taskid) throw new Exception('Task does not exists');
+		if(!$this->taskId) throw new Exception('Task does not exists');
 
-		if($this->v == 1) $this->call('reportbad', ['id' => $this->taskid]);
+		if($this->v == 1) $this->call('reportbad', ['id' => $this->taskId]);
 
 		// обработка v2 должна происходить внутри соответствующих классов
-		if($this->v == 2) $this->debugMessage("reportGood: $this->taskid (idle command)");
+		if($this->v == 2) $this->debugMessage("reportGood: $this->taskId (idle command)");
 	}
 
 	function reportGood(){
-		if(!$this->taskid) throw new Exception('Task does not exists');
+		if(!$this->taskId) throw new Exception('Task does not exists');
 
-		if($this->v == 1) $this->call('reportgood', ['id' => $this->taskid]);
+		if($this->v == 1) $this->call('reportgood', ['id' => $this->taskId]);
 
 		// обработка v2 должна происходить внутри соответствующих классов
-		if($this->v == 2) $this->debugMessage("reportGood: $this->taskid (idle command)");
+		if($this->v == 2) $this->debugMessage("reportGood: $this->taskId (idle command)");
 	}
 
 	protected function genTaskPost(array $post = []): array{
