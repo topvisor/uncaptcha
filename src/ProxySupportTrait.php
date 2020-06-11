@@ -5,7 +5,7 @@ namespace Topvisor\Uncaptcha;
 trait ProxySupportTrait{
 
 	function setProxyType(string $type): void{
-		if(!in_array($type, ['http', 'https', 'socks4', 'socks5'])) throw new Exception("Incorrect proxy type: $type");
+		if(!in_array($type, ['http', 'https', 'socks4', 'socks5'])) throw new \Exception("Incorrect proxy type: $type");
 
 		$this->proxy['type'] = $type;
 	}
