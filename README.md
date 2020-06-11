@@ -116,7 +116,8 @@ $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 	* 1: API style: $host/in.php / simplesite.com/res.php?action=%methodName%
 	* 2: API style: $host/%methodName%
 * **setKey(string $clientKey)** - ваш API ключ к сервису
-* setCreateTaskPost(array $createTaskPost) - проивзольный набор параметров запроса, в основном используется для настройки модуля Custom
+* setCreateTaskPost(array $createTaskPost) - проивзольный набор параметров запроса,
+	в основном используется для настройки модуля Custom
 * setTaskTimeout(int $timeout) - таймаут на разгадывание капчи, по умолчанию 240 секунд
 
 
