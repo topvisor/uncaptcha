@@ -71,6 +71,8 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 
 		if($this->v == 2){
 			if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
+			
+			$this->debugMessage("reportBad: $this->taskId");
 
 			return (bool)$this->call('reportIncorrectRecaptcha', ['taskId' => $this->taskId]);
 		}

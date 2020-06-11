@@ -18,7 +18,7 @@ trait UncaptchaREST{
 	}
 
 	// set $this->result
-	// on success return $this->result->response
+	// on success return $this->result->response or $this->result->status
 	// on error return NULL
 	protected function call(string $methodName, array $post = []): ?string{
 		if(!$this->host) throw new Exception('Please, set host');
@@ -73,6 +73,10 @@ trait UncaptchaREST{
 
 		if($this->result->errorId) return NULL;
 
+		if(!$this->result->response){
+			vd($this->result);
+			return $this->result->status;
+		}
 		return $this->result->response;
 	}
 
@@ -183,7 +187,7 @@ trait UncaptchaREST{
 			}
 		}
 
-		if(!$result->response and !$result->errorId){
+		if(!$result->response and !$result->status and !$result->errorId){
 			$result->errorId = 1;
 			$result->errorCode = 'ERROR_UNKNOWN';
 			$result->errorDescription = '';

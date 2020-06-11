@@ -100,7 +100,10 @@ class Uncaptcha{
 		$ok = $this->createTask();
 		if(!$ok) return NULL;
 
-		return $this->waitForResult();
+		$ok = $this->checkResult();
+		if(!$ok) return NULL;
+
+		return $this->getResult()->response;
 	}
 
 	function getBalance(): ?float{
@@ -124,19 +127,27 @@ class Uncaptcha{
 	function reportBad(): ?bool{
 		if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
-		if($this->v == 1) return (bool)$this->call("reportbad&id=$this->taskId");
+		if($this->v == 1){
+			$this->debugMessage("reportBad: $this->taskId");
+
+			return (bool)$this->call("reportbad&id=$this->taskId");
+		}
 
 		// обработка v2 должна происходить внутри соответствующих классов
-		if($this->v == 2) $this->debugMessage("reportBad: $this->taskId (idle command)");
+		if($this->v == 2) return (bool)$this->debugMessage("reportBad: $this->taskId (idle command)");
 	}
 
 	function reportGood(): ?bool{
-		if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
+		if(!$this->taskId) return (bool)$this->setErrorMessage('Task does not exists');
 
-		if($this->v == 1) return (bool)$this->call("reportgood&id=$this->taskId");
+		if($this->v == 1){
+			$this->debugMessage("reportGood: $this->taskId");
+
+			return (bool)$this->call("reportgood&id=$this->taskId");
+		}
 
 		// обработка v2 должна происходить внутри соответствующих классов
-		if($this->v == 2) $this->debugMessage("reportGood: $this->taskId (idle command)");
+		if($this->v == 2) return (bool)$this->debugMessage("reportGood: $this->taskId (idle command)");
 	}
 
 	private function createTask(): bool{
@@ -185,7 +196,7 @@ class Uncaptcha{
 		return $post;
 	}
 
-	private function waitForResult(): bool{
+	private function checkResult(): bool{
 		$timeStart = time();
 
 		if($this->taskTimeoutElapsed == 0) sleep(3);
@@ -215,11 +226,11 @@ class Uncaptcha{
 					return false;
 				}
 
-				return $this->waitForResult();
+				return $this->checkResult();
 
 			case '1':
 			case 'ready':
-				$this->debugMessage('<b>Task complete</b>');
+				$this->debugMessage('<b>Task complete:</b> '.$result->response);
 
 				return true;
 			default:
