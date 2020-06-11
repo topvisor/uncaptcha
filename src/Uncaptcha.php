@@ -94,46 +94,47 @@ class Uncaptcha{
 		$this->taskId = 0;
 		$this->taskTimeoutElapsed = 0;
 
+		$this->debugMessage('<b>Create task</b>');
 		$result = $this->call('createTask', ['task' => $this->genTaskPost()]);
 		if(!$result) return false;
 
-		if(!isset($result->taskId)){
-			$this->setErrorMessage('Expected taskId in response');
+		if(!$result->response){
+			$this->setErrorMessage('Expected response');
 			return false;
 		}
 
-		$this->taskId = $result->taskId;
+		$this->taskId = $result->response;
 
 		return true;
 	}
 
-	function waitForResult(): bool{
-		if($this->taskTimeoutElapsed > $this->taskTimeout){
-			$this->setErrorMessage("Timeout exceeded: $this->taskTimeoutElapsed secs");
-
-			return false;
-		}
-
+	function waitForResult(): ?\stdClass{
 		$timeStart = time();
 
 		if($this->taskTimeoutElapsed == 0) sleep(3);
 
-		$this->debugMessage('Check task status');
+		$this->debugMessage('<b>Check task status'.($this->taskTimeoutElapsed?' (repeat)':'').'</b>');
 		$result = $this->call('getTaskResult', ['taskId' => $this->taskId]);
-		if(!$result) return false;
+		if(!$result) return $result;
 
 		$timeElapsed = time() - $timeStart;
 
 		switch($result->status){
 			case 'processing':
 				if($timeElapsed < 3){
-					$this->debugMessage('waiting 3 seconds');
+					$this->debugMessage('Waiting 3 seconds');
 
 					sleep(3);
 					$timeElapsed += 3;
 				}
 
 				$this->taskTimeoutElapsed += $timeElapsed;
+
+				if($this->taskTimeoutElapsed > $this->taskTimeout){
+					$this->setErrorMessage("Timeout exceeded: $this->taskTimeoutElapsed secs");
+
+					return NULL;
+				}
 
 				return $this->waitForResult();
 
@@ -149,6 +150,8 @@ class Uncaptcha{
 	}
 
 	function getBalance(): ?float{
+		$this->debugMessage('<b>Get balance</b>');
+
 		$result = $this->call('getBalance');
 		if(!$result) return $result;
 
@@ -156,10 +159,14 @@ class Uncaptcha{
 	}
 
 	function getAppStats(): ?\stdClass{
+		$this->debugMessage('<b>Get app stats</b>');
+
 		return $this->call('getAppStats');
 	}
 
 	function getCMStatus(): ?\stdClass{
+		$this->debugMessage('<b>Get smc stats</b>');
+
 		return $this->call("getcmstatus?key=$this->clientKey");
 	}
 

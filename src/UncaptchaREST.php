@@ -18,30 +18,7 @@ trait UncaptchaREST{
 
 		$url = "$this->scheme://$this->host";
 
-		if($this->v == 1){
-			switch($methodName){
-				case 'getTest':
-					$url .= 'res.php?';
-				case 'createTask':
-					$url .= '/in.php?';
-
-					break;
-				case 'getTaskResult':
-					$url .= '/res.php?action=get';
-
-					break;
-
-					break;
-				default:
-					$url .= "/res.php?action=$methodName";
-			}
-
-			$url .= "&key=$this->clientKey&json=1";
-		}else{
-			$url .= "/$methodName";
-
-			$post['clientKey'] = $this->clientKey;
-		}
+		$this->prepareRequest($methodName, $url, $post);
 
 		$json = json_encode($post, JSON_PRETTY_PRINT);
 
@@ -92,6 +69,46 @@ trait UncaptchaREST{
 		return $this->curlResult;
 	}
 
+	private function prepareRequest($methodName, &$_url, &$_post){
+		if($this->v == 1){
+			switch($methodName){
+				case 'getTest':
+					$_url .= 'res.php?';
+				case 'createTask':
+					$_url .= '/in.php?';
+
+					$_post = $_post['task'];
+
+					break;
+				case 'getTaskResult':
+					$_url .= '/res.php?action=get2';
+
+					$_post['id'] = $_post['taskId'];
+					unset($_post['taskId']);
+					
+					$_url .= '&'.http_build_query($_post);
+
+					break;
+
+					break;
+				default:
+					$_url .= "/res.php?action=$methodName";
+			}
+
+			$_url .= "&key=$this->clientKey&json=1";
+		}else{
+			$_url .= "/$methodName";
+
+			$_post['clientKey'] = $this->clientKey;
+		}
+
+		if($this->host == 'rucaptcha.com'){
+			if(isset($_post['cookies'])) $_post['cookies'] = preg_replace('~(\w+)=([^;]+)(; ?)?~', '$1:$2;', $_post['cookies']);
+		}
+
+		if(isset($_post['cookies'])) $_post['cookies'] = trim($_post['cookies'], '; ');
+	}
+
 	private function genResult(string $response): \stdClass{
 		$result = json_decode($response);
 
@@ -117,7 +134,7 @@ trait UncaptchaREST{
 					$result->response = NULL;
 				}
 
-				###if(isset($result->error_text)) $result->errorDescription = $result->error_text
+				if(isset($result->error_text)) $result->errorDescription = $result->error_text;
 			}
 
 			// если json=1 не поддерживается, то вернется plain text в формате status|result
