@@ -75,7 +75,7 @@ Additionally, they can be accessed through getDebugLog(), for example, to write 
 $logs = $uncaptcha->getDebugLog();
 ```
 
-Depending on whether the captcha is accepted by the server, you can send a notification to the serial:
+Depending on whether the captcha is accepted by the server, you can send a notification to the service:
 
 ```php
 // $uncaptcha->reportGood(); // captcha solved correctly
