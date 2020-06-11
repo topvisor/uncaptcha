@@ -18,9 +18,9 @@ https://rucaptcha.com/api-rucaptcha.
 
 # Установка
 
-Используйте [composer](https://getcomposer.org/) для установки
+Используйте [composer](https://getcomposer.org/) для установки.
 
-composer.json
+composer.json:
 ```json
 {
     "repositories":[
@@ -44,7 +44,7 @@ include_once('%PATH_TO_COMPOSER%/vendor/autoload.php');
 
 $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 
-$uncaptcha->setTimeout(10); // таймаут соедиения
+$uncaptcha->setTimeout(20); // таймаут соедиения
 $uncaptcha->setTaskTimeout(240); // таймаут распознавания
 $uncaptcha->setDebugLevel(1); // 0 - без лога, 1 - короткий лог, 2 - полный лог
 
@@ -54,7 +54,7 @@ $uncaptcha->setHost('rucaptcha.com');
 $uncaptcha->setV(1); // in.php / res.php style
 $uncaptcha->setKey('ab67bdd53139c02b7e343819881f0c0a');
 
-$uncaptcha->setBodyFromFile('https://otvet.imgsmail.ru/download/208657305_63b5eaa23dda595bd1997f979a875a3e_800.jpg');
+$uncaptcha->setBodyFromFile('%URL_IMAGE%');
 
 $result = $uncaptcha->resolve();
 if(!$result){
@@ -64,10 +64,18 @@ if(!$result){
 
 echo 'Капча разгадана: "'.$result.'" за '.$uncaptcha->getTaskElapsed().' сек.';
 
-// логи, полученные в результате разгадывания, будут выведены на экран, если же с ними нужно что-то сделать, их можно получить так:
-// $logs = $Uncaptcha->getDebugLog();
-//
-// в зависимости от того, принята ли капча сервером, можно отправить уведомление серису:
+```
+
+Логи, полученные в результате разгадывания, будут выведены на экран.
+Дополнительно к ним можно получить доступ через getDebugLog(), например для записи в БД:
+
+```php
+$logs = $Uncaptcha->getDebugLog();
+```
+
+в зависимости от того, принята ли капча сервером, можно отправить уведомление серису:
+
+```php
 // $Uncaptcha->reportGood(); // капча разгадана верно
 // $Uncaptcha->reportGood(); // капча разгадана неверно
 ```
