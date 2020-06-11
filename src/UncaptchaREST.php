@@ -4,7 +4,7 @@ namespace Topvisor\Uncaptcha;
 
 trait UncaptchaREST{
 
-	private $timeout = 30;
+	private $timeout = 20;
 	private $curlResponse = NULL;
 	private $curlErrorMessage = NULL;
 	private $result = NULL; // формат объекта см. в genResult()
