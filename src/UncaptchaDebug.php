@@ -4,23 +4,40 @@ namespace Topvisor\Uncaptcha;
 
 trait UncaptchaDebug{
 
-	private $debugEnabled = false;
-	private $debugIsCLI = NULL;
-	private $debugMessages = [];
+	private $debugLevel = 0; // 0 - without log, 1 - short log, 2 - full log
+	private $debugLabel = '';
+	private $debugLog = [];
 
-	function setDebugEnabled(bool $debugEnabled = true): void{
-		$this->debugIsCLI = function_exists('cli_set_process_title');
-
-		$this->debugEnabled = $debugEnabled;
+	function setDebugLevel(int $debugLevel): void{
+		$this->debugLevel = $debugLevel;
 	}
 
-	function debugMessage(string $message): void{
-		if(!$this->debugEnabled) return;
+	function setDebugLabel(string $debugLabel): void{
+		$this->debugLabel = $debugLabel;
+	}
+
+	private function genDebugLabel(): string{
+		$label = get_class($this);
+		$label = explode('\\', $label);
+		$label = $label[count($label) - 1];
+		$label = preg_replace('~[a-z]~', '', $label);
+
+		if($this->debugLabel) $label = $this->debugLabel.'_'.$label;
+		if($this->proxy['server']) $label .= ' (P)';
+
+		return $label;
+	}
+
+	function debugLog(string $message, int $debugLevel = 1): void{
+		$message = str_replace($this->clientKey, '**********', $message);
+		if($this->proxy['password']) $message = str_replace($this->proxy['password'], '**********', $message);
+
+		if($this->debugLevel < $debugLevel) return;
 
 		$message .= "\n";
 		$message = preg_replace('~<br\s?/?>~', "\n", $message);
 
-		if($this->debugIsCLI){
+		if($this->isCLI){
 			$message = strip_tags($message);
 		}else{
 			$message = "<pre>$message</pre>";
@@ -28,11 +45,11 @@ trait UncaptchaDebug{
 
 		echo $message;
 
-		$this->messages[] = $message;
+		$this->debugLog[] = $message;
 	}
 
-	function getDebugMessages(): array{
-		return $this->messages;
+	function getDebugLog(): array{
+		return $this->debugLog;
 	}
 
 }

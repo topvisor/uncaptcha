@@ -67,12 +67,15 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 	}
 
 	function reportBad(): ?bool{
-		if($this->v == 1) return parent::reportBad();
+		if(
+			$this->v == 1 or
+			md5($this->host) != '0529087a3e61e81284291fdaeec13a48'
+		) return parent::reportBad();
 
 		if($this->v == 2){
 			if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
-			
-			$this->debugMessage("reportBad: $this->taskId");
+
+			$this->debugLog("reportBad: $this->taskId");
 
 			return (bool)$this->call('reportIncorrectRecaptcha', ['taskId' => $this->taskId]);
 		}

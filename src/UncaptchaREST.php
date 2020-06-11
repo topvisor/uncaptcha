@@ -29,9 +29,9 @@ trait UncaptchaREST{
 
 		$json = json_encode($post, JSON_PRETTY_PRINT);
 
-		$this->debugMessage('');
-		$this->debugMessage("================= $url =================");
-		$this->debugMessage($json);
+		$this->debugLog('', 2);
+		$this->debugLog("================= $url =================", 2);
+		$this->debugLog($json, 2);
 
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -57,19 +57,19 @@ trait UncaptchaREST{
 		if($this->curlErrorMessage){
 			$this->curlErrorMessage .= ' ('.curl_errno($ch).')';
 
-			$this->debugMessage("Curl: $this->curlErrorMessage");
+			$this->debugLog("- Curl: $this->curlErrorMessage");
 		}
 
-		$this->debugMessage("'$this->curlResponse'");
+		$this->debugLog("'$this->curlResponse'", 2);
 
 		$this->result = $this->genResult($this->curlResponse);
 		if($this->result->errorId){
-			$this->setErrorMessage($this->result->errorDescription.' ('.$this->result->errorCode.')'.' ['.$this->result->errorId.']');
+			$this->setErrorMessage('- '.$this->result->errorDescription.' ('.$this->result->errorCode.')'.' ['.$this->result->errorId.']');
 		}
 
 		curl_close($ch);
 
-		$this->debugMessage('=================');
+		$this->debugLog('=================', 2);
 
 		if($this->result->errorId) return NULL;
 

@@ -19,9 +19,9 @@ class Uncaptcha{
 	const V = '1.3.2';
 
 	protected $referalId = NULL;
-	protected $scheme = 'http';
+	private $scheme = 'http';
 	protected $host = '';
-	protected $clientKey = NULL;
+	private $clientKey = NULL;
 	protected $v = NULL;
 	protected $post = [];
 	protected $proxy = [
@@ -35,8 +35,13 @@ class Uncaptcha{
 	protected $cookies = NULL;
 	protected $taskId = NULL;
 	private $taskTimeout = 240;
-	private $taskTimeoutElapsed = 0;
+	private $taskElapsed = 0;
 	private $errorMessage = '';
+	private $isCLI = NULL;
+
+	function __construct(){
+		$this->isCLI = function_exists('cli_set_process_title');
+	}
 
 	function setReferalId(int $referalId): void{
 		$this->referalId = $referalId;
@@ -51,7 +56,7 @@ class Uncaptcha{
 
 		switch($host){
 			case 'rucaptcha.com':
-				$this->referalId = 2708; // referer автора этой библиотеки
+				$this->referalId = 2708; // referer author
 				$this->v = 1;
 
 				break;
@@ -62,8 +67,8 @@ class Uncaptcha{
 		}
 	}
 
-	// v1 - симуляция API вида simplesite.com/in.php / simplesite.com/res.php
-	// v2 - симуляция API вида api.simplesite.com
+	// v1 - API style: simplesite.com/in.php / simplesite.com/res.php?action=%methodName%
+	// v2 - API style: api.simplesite.com/%methodName%
 	function setV(int $v): void{
 		$this->v = $v;
 	}
@@ -80,6 +85,10 @@ class Uncaptcha{
 		$this->taskTimeout = $timeout;
 	}
 
+	function getTaskElapsed(): int{
+		return $this->taskElapsed;
+	}
+
 	function getErrorMessage(): string{
 		return $this->errorMessage;
 	}
@@ -87,7 +96,7 @@ class Uncaptcha{
 	protected function setErrorMessage(string $message): void{
 		$this->errorMessage = $message;
 
-		$this->debugMessage($message);
+		$this->debugLog($message);
 	}
 
 	function getTaskid(): ?string{
@@ -95,31 +104,48 @@ class Uncaptcha{
 	}
 
 	// return result object with additional property "taskId"
-	// view result object in genResult()
+	// see result object in genResult() fore more information
 	function resolve(): ?string{
-		$ok = $this->createTask();
-		if(!$ok) return NULL;
+		$label = $this->genDebugLabel();
 
-		$ok = $this->checkResult();
+		$this->debugLog('<b>Captcha resolving</b>');
+		$this->debugLog("===== $label =====");
+		$this->debugLog("- $this->host");
+
+		$ok = $this->createTask();
+		if($ok) $ok = $this->checkResult();
+
+		if($ok){
+			$responseForLog = $this->getResult()->response;
+			if(!$this->isCLI) $responseForLog = '<i title="'.$responseForLog.'">hoverMe</i>';
+			$this->debugLog("- response: $responseForLog");
+		}else{
+			$this->debugLog('- fail');
+		}
+		$this->debugLog('- elapsed: '.$this->taskElapsed);
+		$this->debugLog('- task id: '.$this->taskId);
+
+		$this->debugLog("===== /$label =====");
+
 		if(!$ok) return NULL;
 
 		return $this->getResult()->response;
 	}
 
 	function getBalance(): ?float{
-		$this->debugMessage('<b>Get balance</b>');
+		$this->debugLog('<b>Get balance</b>');
 
 		return $this->call('getBalance');
 	}
 
 	function getAppStats(): ?\stdClass{
-		$this->debugMessage('<b>Get app stats</b>');
+		$this->debugLog('<b>Get app stats</b>');
 
 		return $this->call('getAppStats');
 	}
 
 	function getCMStatus(): ?\stdClass{
-		$this->debugMessage('<b>Get smc stats</b>');
+		$this->debugLog('<b>Get smc stats</b>');
 
 		return $this->call("getcmstatus?key=$this->clientKey");
 	}
@@ -128,33 +154,33 @@ class Uncaptcha{
 		if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
 		if($this->v == 1){
-			$this->debugMessage("reportBad: $this->taskId");
+			$this->debugLog("reportBad: $this->taskId");
 
 			return (bool)$this->call("reportbad&id=$this->taskId");
 		}
 
-		// обработка v2 должна происходить внутри соответствующих классов
-		if($this->v == 2) return (bool)$this->debugMessage("reportBad: $this->taskId (idle command)");
+		// processing v2 must do in Module Class
+		if($this->v == 2) return (bool)$this->debugLog("reportBad: $this->taskId (idle command)");
 	}
 
 	function reportGood(): ?bool{
 		if(!$this->taskId) return (bool)$this->setErrorMessage('Task does not exists');
 
 		if($this->v == 1){
-			$this->debugMessage("reportGood: $this->taskId");
+			$this->debugLog("reportGood: $this->taskId");
 
 			return (bool)$this->call("reportgood&id=$this->taskId");
 		}
 
-		// обработка v2 должна происходить внутри соответствующих классов
-		if($this->v == 2) return (bool)$this->debugMessage("reportGood: $this->taskId (idle command)");
+		// processing v2 must do in module Class
+		if($this->v == 2) return (bool)$this->debugLog("reportGood: $this->taskId (idle command)");
 	}
 
 	private function createTask(): bool{
 		$this->taskId = 0;
-		$this->taskTimeoutElapsed = 0;
+		$this->taskElapsed = 0;
 
-		$this->debugMessage('<b>Create task</b>');
+		$this->debugLog('<b>Create task</b>', 2);
 		$this->taskId = (int)$this->call('createTask', ['task' => $this->genCreateTaskPost()]);
 
 		return (bool)$this->taskId;
@@ -199,29 +225,28 @@ class Uncaptcha{
 	private function checkResult(): bool{
 		$timeStart = time();
 
-		if($this->taskTimeoutElapsed == 0) sleep(3);
+		if($this->taskElapsed == 0) sleep(3);
 
-		$this->debugMessage('<b>Check task status'.($this->taskTimeoutElapsed?' (repeat)':'').'</b>');
+		$this->debugLog('<b>Check task status'.($this->taskElapsed?' (repeat)':'').'</b>', 2);
 		$response = $this->call('getTaskResult', ['taskId' => $this->taskId]);
 		if(!$response) return false;
 
 		$timeElapsed = time() - $timeStart;
+		$this->taskElapsed += $timeElapsed;
 
 		$result = $this->getResult();
 		switch($result->status){
 			case '0':
 			case 'processing':
 				if($timeElapsed < 3){
-					$this->debugMessage('Waiting 3 seconds');
+					$this->debugLog('- wait 3 seconds');
 
 					sleep(3);
-					$timeElapsed += 3;
+					$this->taskElapsed += 3;
 				}
 
-				$this->taskTimeoutElapsed += $timeElapsed;
-
-				if($this->taskTimeoutElapsed > $this->taskTimeout){
-					$this->setErrorMessage("Timeout exceeded: $this->taskTimeoutElapsed secs");
+				if($this->taskElapsed > $this->taskTimeout){
+					$this->setErrorMessage("Timeout exceeded: $this->taskElapsed secs");
 
 					return false;
 				}
@@ -230,7 +255,6 @@ class Uncaptcha{
 
 			case '1':
 			case 'ready':
-				$this->debugMessage('<b>Task complete:</b> '.$result->response);
 
 				return true;
 			default:
