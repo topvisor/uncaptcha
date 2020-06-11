@@ -100,7 +100,7 @@ class Uncaptcha{
 	protected function setErrorMessage(string $message): void{
 		$this->errorMessage = $message;
 
-		$this->debugLog($message, 2);
+		$this->debugLog($message);
 	}
 
 	// return result object with additional property "taskId"
@@ -128,6 +128,7 @@ class Uncaptcha{
 		$this->debugLog("===== /$label =====");
 
 		if(!$ok) return NULL;
+		vd($this->getResult());
 
 		return $this->getResult()->response;
 	}
