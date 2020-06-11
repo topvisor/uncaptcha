@@ -13,7 +13,7 @@ trait UncaptchaREST{
 		$this->timeout = $timeout;
 	}
 
-	private function call(string $methodName, array $post = []): ?\stdClass{
+	protected function call(string $methodName, array $post = []): ?\stdClass{
 		if(!$this->host) throw new Exception('Please, set host');
 
 		$url = "$this->scheme://$this->host";

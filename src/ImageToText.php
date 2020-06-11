@@ -102,7 +102,7 @@ class ImageToText extends Uncaptcha{
 		if($this->v == 1) return parent::reportBad();
 
 		if($this->v == 2){
-			if(!$this->taskId) throw new Exception('Task does not exists');
+			if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
 			return $this->call('reportIncorrectImageCaptcha', ['taskId' => $this->taskId]);
 		}

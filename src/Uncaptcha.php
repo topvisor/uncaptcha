@@ -19,7 +19,7 @@ class Uncaptcha{
 	const V = '1.3.2';
 
 	protected $referalId = NULL;
-	protected $scheme = 'https';
+	protected $scheme = 'http';
 	protected $host = '';
 	protected $clientKey = NULL;
 	protected $v = NULL;
@@ -33,7 +33,7 @@ class Uncaptcha{
 	];
 	protected $userAgent = NULL;
 	protected $cookies = NULL;
-	private $taskId = 0;
+	protected $taskId = 51781204846;
 	private $taskTimeout = 240;
 	private $taskTimeoutElapsed = 0;
 	private $errorMessage = '';
@@ -72,18 +72,16 @@ class Uncaptcha{
 		$this->clientKey = $clientKey;
 	}
 
-	function setCookies(string $cookies): void{
-		if($this->v == 2) throw new Exception('This function not allowed for this driver');
-
-		$this->cookies = $cookies;
-	}
-
 	function setPost(array $post): void{
 		$this->post = $post;
 	}
 
 	function setTaskTimeout(int $timeout): void{
 		$this->taskTimeout = $timeout;
+	}
+
+	function getErrorMessage(): string{
+		return $this->errorMessage;
 	}
 
 	protected function setErrorMessage(string $message): void{
@@ -166,18 +164,18 @@ class Uncaptcha{
 	}
 
 	function reportBad(){
-		if(!$this->taskId) throw new Exception('Task does not exists');
+		if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
-		if($this->v == 1) $this->call('reportbad', ['id' => $this->taskId]);
+		if($this->v == 1) return $this->call('reportbad', ['id' => $this->taskId]);
 
 		// обработка v2 должна происходить внутри соответствующих классов
-		if($this->v == 2) $this->debugMessage("reportGood: $this->taskId (idle command)");
+		if($this->v == 2) $this->debugMessage("reportBad: $this->taskId (idle command)");
 	}
 
 	function reportGood(){
-		if(!$this->taskId) throw new Exception('Task does not exists');
+		if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
-		if($this->v == 1) $this->call('reportgood', ['id' => $this->taskId]);
+		if($this->v == 1) return $this->call('reportgood', ['id' => $this->taskId]);
 
 		// обработка v2 должна происходить внутри соответствующих классов
 		if($this->v == 2) $this->debugMessage("reportGood: $this->taskId (idle command)");
