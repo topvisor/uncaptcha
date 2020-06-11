@@ -1,7 +1,27 @@
 {
 	"name":"topvisor/uncaptcha",
 	"description":"Library for solve captcha by services",
-	"keywords":["PHP", "Uncaptcha", "Captcha", "reCaptcha 2", "reCaptcha 3", "FunCaptcha", "GeeTest", "hCaptcha", "Image captcha"],
+	"keywords":[
+		"PHP",
+
+		"Uncaptcha",
+		
+		"Captcha",
+		"ruCaptcha",
+		"Anti сaptcha",
+		"reCaptcha 2",
+		"reCaptcha 3",
+		"FunCaptcha",
+		"GeeTest",
+		"hCaptcha",
+		"Image captcha",
+
+		"Рукапча",
+		"Рекапча",
+		"Рекапча 2",
+		"Рекапча 3",
+		"Текстовые капчи"
+	],
 	"license":"MIT",
 	"type":"library",
 	"authors":[
