@@ -27,7 +27,7 @@ trait UncaptchaREST{
 
 		$this->prepareRequest($methodName, $url, $post);
 
-		$json = json_encode($post, JSON_PRETTY_PRINT);
+		$postJson = json_encode($post, JSON_PRETTY_PRINT);
 
 		$this->debugLog('', 2);
 		$this->debugLog("================= $url =================", 2);
