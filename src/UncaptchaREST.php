@@ -85,7 +85,7 @@ trait UncaptchaREST{
 
 					$_post['id'] = $_post['taskId'];
 					unset($_post['taskId']);
-					
+
 					$_url .= '&'.http_build_query($_post);
 
 					break;
@@ -95,7 +95,7 @@ trait UncaptchaREST{
 					$_url .= "/res.php?action=$methodName";
 			}
 
-			$_url .= "&key=$this->clientKey&json=1";
+			$_url .= "&key=$this->clientKey&json=0";
 		}else{
 			$_url .= "/$methodName";
 
@@ -139,9 +139,14 @@ trait UncaptchaREST{
 
 			// если json=1 не поддерживается, то вернется plain text в формате status|result
 			if(!$result->response and !$result->errorId){
-				if(count(explode('|', $response)) == 2){
-					$result->status = (explode('|', $response)[0] == 'OK')?'ready':'processing';
+				if(count(explode('|', $response)) >= 2){
+					$result->status = (explode('|', $response)[0] == 'OK')?'1':'0';
 					$result->response = explode('|', $response)[1];
+				}
+
+				if($response == 'CAPCHA_NOT_READY'){
+					$result->status = '0';
+					$result->response = 'CAPCHA_NOT_READY';
 				}
 			}
 		}
