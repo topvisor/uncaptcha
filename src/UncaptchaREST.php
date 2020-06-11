@@ -73,11 +73,10 @@ trait UncaptchaREST{
 
 		if($this->result->errorId) return NULL;
 
-		if(!$this->result->response){
-			vd($this->result);
-			return $this->result->status;
-		}
-		return $this->result->response;
+		if($this->result->response) return $this->result->response;
+		if($this->result->status) return $this->result->status;
+
+		return NULL;
 	}
 
 	private function prepareRequest($methodName, &$_url, &$_post){
