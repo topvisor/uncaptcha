@@ -208,11 +208,13 @@ class Uncaptcha{
 		}
 
 		if($this->v == 2){
-			$post['proxyType'] = $this->proxy['type'];
-			if($this->proxy['login']) $post['proxyLogin'] = $this->proxy['login'];
-			if($this->proxy['password']) $post['proxyPassword'] = $this->proxy['password'];
-			if($this->proxy['server']) $post['proxyAddress'] = $this->proxy['server'];
-			if($this->proxy['port']) $post['proxyPort'] = $this->proxy['port'];
+			if($this->proxy['server']){
+				$post['proxyType'] = $this->proxy['type'];
+				if($this->proxy['login']) $post['proxyLogin'] = $this->proxy['login'];
+				if($this->proxy['password']) $post['proxyPassword'] = $this->proxy['password'];
+				if($this->proxy['server']) $post['proxyAddress'] = $this->proxy['server'];
+				if($this->proxy['port']) $post['proxyPort'] = $this->proxy['port'];
+			}
 
 			if($this->userAgent) $post['userAgent'] = $this->userAgent;
 		}
