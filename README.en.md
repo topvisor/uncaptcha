@@ -121,7 +121,7 @@ Service Settings
 * setTimeout() - connection timeout, default 20 seconds
 
 Captcha settings
-* setCreateTaskPost (array $createTaskPost) - a random set of query parameters, mainly used to configure the Custom module
+* setCreateTaskPost (array $createTaskPost) - set of any query parameters, mainly used to configure the Custom module
 * setTaskTimeout (int $timeout) - timeout for solving captcha, default is 240 seconds
 
 Resolving process
