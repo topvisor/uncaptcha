@@ -113,8 +113,8 @@ $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 * $uncaptcha->setUseHTTPS(bool $useHTTPS) - использовать https
 * **$uncaptcha->setHost(string $host)** - хост сервиса для распознавания
 * **$uncaptcha->setV(int $v)** - версия API сервиса, поддерживаеся два значения:
-** 1: API style: $host/in.php / simplesite.com/res.php?action=%methodName%
-** 2: API style: $host/%methodName%
+	* 1: API style: $host/in.php / simplesite.com/res.php?action=%methodName%
+	* 2: API style: $host/%methodName%
 * **$uncaptcha->setKey(string $clientKey)** - ваш API ключ к сервису
 * $uncaptcha->setCreateTaskPost(array $createTaskPost) - проивзольный набор параметров запроса, в основном используется для настройки модуля Custom
 * $uncaptcha->setTaskTimeout(int $timeout) - таймаут на разгадывание капчи, по умолчанию 240 секунд
