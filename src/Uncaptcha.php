@@ -96,7 +96,7 @@ class Uncaptcha{
 	protected function setErrorMessage(string $message): void{
 		$this->errorMessage = $message;
 
-		$this->debugLog($message);
+		$this->debugLog($message, 2);
 	}
 
 	function getTaskid(): ?string{
@@ -193,19 +193,18 @@ class Uncaptcha{
 		if($this->v == 1){
 			if($this->proxy['server']){
 				$post['proxytype'] = $this->proxy['type'];
-				$postdata['proxy'] = '';
+				$post['proxy'] = '';
 				if($this->proxy['login']){
-					$postdata['proxy'] .= $this->proxy['login'];
-					if($this->proxy['password']) $postdata['proxy'] .= ':'.$this->proxy['password'];
-					$postdata['proxy'] .= '@';
+					$post['proxy'] .= $this->proxy['login'];
+					if($this->proxy['password']) $post['proxy'] .= ':'.$this->proxy['password'];
+					$post['proxy'] .= '@';
 				}
-				$postdata['proxy'] .= $this->proxy['server'];
-				$postdata['proxy'] .= ':'.$this->proxy['port'];
+				$post['proxy'] .= $this->proxy['server'];
+				$post['proxy'] .= ':'.$this->proxy['port'];
 			}
 
 			if($this->userAgent) $post['UserAgent'] = $this->userAgent;
-
-			$postdata['soft_id'] = $this->referalId;
+			if($this->referalId) $post['soft_id'] = $this->referalId;
 		}
 
 		if($this->v == 2){
