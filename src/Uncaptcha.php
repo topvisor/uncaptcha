@@ -235,9 +235,12 @@ class Uncaptcha{
 	}
 
 	private function checkResult(): bool{
-		$timeStart = time();
+		if($this->taskElapsed == 0){
+			sleep(3);
+			$this->taskElapsed += 3;
+		}
 
-		if($this->taskElapsed == 0) sleep(3);
+		$timeStart = time();
 
 		$this->debugLog('<b>Check task status'.($this->taskElapsed?' (repeat)':'').'</b>', 2);
 		$response = $this->call('getTaskResult', ['taskId' => $this->taskId]);
