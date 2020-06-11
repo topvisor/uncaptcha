@@ -37,6 +37,8 @@ trait UncaptchaDebug{
 		$message .= "\n";
 		$message = preg_replace('~<br\s?/?>~', "\n", $message);
 
+		$this->debugLog[] = $message;
+
 		if($this->isCLI){
 			$message = strip_tags($message);
 		}else{
@@ -44,8 +46,6 @@ trait UncaptchaDebug{
 		}
 
 		echo $message;
-
-		$this->debugLog[] = $message;
 	}
 
 	function getDebugLog(): array{
