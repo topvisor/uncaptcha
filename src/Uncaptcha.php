@@ -111,9 +111,19 @@ class Uncaptcha{
 		$this->debugLog('<b>Captcha resolving</b>');
 		$this->debugLog("===== $label =====");
 		$this->debugLog("- $this->host");
+		$this->debugLog('');
 
 		$ok = $this->createTask();
-		if($ok) $ok = $this->checkResult();
+
+		if($ok){
+			$this->debugLog('- task id: '.$this->taskId);
+			$this->debugLog('');
+
+			$ok = $this->checkResult();
+		}
+
+		$this->debugLog('');
+		$this->debugLog('- elapsed: '.$this->taskElapsed);
 
 		if($ok){
 			$responseForLog = $this->getResult()->response;
@@ -122,8 +132,6 @@ class Uncaptcha{
 		}else{
 			$this->debugLog('- fail');
 		}
-		$this->debugLog('- elapsed: '.$this->taskElapsed);
-		$this->debugLog('- task id: '.$this->taskId);
 
 		$this->debugLog("===== /$label =====");
 
