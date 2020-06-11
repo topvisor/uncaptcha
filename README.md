@@ -109,18 +109,20 @@ $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 
 Базовые методы доступны для всех модулей
 
-* $uncaptcha->setReferalId(string $referalId) - код referalId может испоьзвоаться в некоторых сервисах
-* $uncaptcha->setUseHTTPS(bool $useHTTPS) - использовать https
-* **$uncaptcha->setHost(string $host)** - хост сервиса для распознавания
-* **$uncaptcha->setV(int $v)** - версия API сервиса, поддерживаеся два значения:
+* setReferalId(string $referalId) - код referalId может испоьзвоаться в некоторых сервисах
+* setUseHTTPS(bool $useHTTPS) - использовать https
+* **setHost(string $host)** - хост сервиса для распознавания
+* **setV(int $v)** - версия API сервиса, поддерживаеся два значения:
 	* 1: API style: $host/in.php / simplesite.com/res.php?action=%methodName%
 	* 2: API style: $host/%methodName%
-* **$uncaptcha->setKey(string $clientKey)** - ваш API ключ к сервису
-* $uncaptcha->setCreateTaskPost(array $createTaskPost) - проивзольный набор параметров запроса, в основном используется для настройки модуля Custom
-* $uncaptcha->setTaskTimeout(int $timeout) - таймаут на разгадывание капчи, по умолчанию 240 секунд
+* **setKey(string $clientKey)** - ваш API ключ к сервису
+* setCreateTaskPost(array $createTaskPost) - проивзольный набор параметров запроса, в основном используется для настройки модуля Custom
+* setTaskTimeout(int $timeout) - таймаут на разгадывание капчи, по умолчанию 240 секунд
 
-* **$uncaptcha->resolve()** - запустить разгадывание, вернет результат
-* $uncaptcha->getTaskElapsed() - получить время, затраченное на разгадывание капчи
-* $uncaptcha->getTaskid() - получить id задачи, id создается при начале разгадывания, см. $uncaptcha->resolve()
-* $uncaptcha->getErrorMessage() - получить текст последней ошибки
-* $uncaptcha->getResult() - Иногда требуется получить больше информации, чем просто текст с картинки. Этот метод вернет объект с результатом
+* **resolve()** - запустить разгадывание, вернет результат
+* getTaskElapsed() - получить время, затраченное на разгадывание капчи
+* getTaskid() - получить id задачи, id создается при начале разгадывания, см. resolve()
+* getErrorMessage() - получить текст последней ошибки
+
+* setTimeout() - Таймаут соединения, по умолчанию 20 секунд
+* getResult() - Иногда требуется получить больше информации, чем просто текст с картинки. Этот метод вернет объект с результатом
