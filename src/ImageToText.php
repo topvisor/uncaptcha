@@ -13,7 +13,7 @@ class ImageToText extends Uncaptcha{
 	private $maxLength = 0;
 	private $language = 0;
 
-	function genTaskPost(array $post = []): array{
+	function genCreateTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [
@@ -45,7 +45,7 @@ class ImageToText extends Uncaptcha{
 				break;
 		}
 
-		return parent::genTaskPost($post);
+		return parent::genCreateTaskPost($post);
 	}
 
 	function setBody(string $base64Data): void{
@@ -98,13 +98,13 @@ class ImageToText extends Uncaptcha{
 		$this->language = $language;
 	}
 
-	function reportBad(){
+	function reportBad(): ?bool{
 		if($this->v == 1) return parent::reportBad();
 
 		if($this->v == 2){
 			if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
-			return $this->call('reportIncorrectImageCaptcha', ['taskId' => $this->taskId]);
+			return (bool)$this->call('reportIncorrectImageCaptcha', ['taskId' => $this->taskId]);
 		}
 	}
 

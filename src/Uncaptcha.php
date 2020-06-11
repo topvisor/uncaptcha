@@ -33,7 +33,7 @@ class Uncaptcha{
 	];
 	protected $userAgent = NULL;
 	protected $cookies = NULL;
-	protected $taskId = 51781204846;
+	protected $taskId = NULL;
 	private $taskTimeout = 240;
 	private $taskTimeoutElapsed = 0;
 	private $errorMessage = '';
@@ -90,74 +90,23 @@ class Uncaptcha{
 		$this->debugMessage($message);
 	}
 
-	function createTask(): bool{
-		$this->taskId = 0;
-		$this->taskTimeoutElapsed = 0;
-
-		$this->debugMessage('<b>Create task</b>');
-		$result = $this->call('createTask', ['task' => $this->genTaskPost()]);
-		if(!$result) return false;
-
-		if(!$result->response){
-			$this->setErrorMessage('Expected response');
-			return false;
-		}
-
-		$this->taskId = $result->response;
-
-		return true;
+	function getTaskid(): ?string{
+		return $this->taskId;
 	}
 
-	function waitForResult(): ?\stdClass{
-		$timeStart = time();
+	// return result object with additional property "taskId"
+	// view result object in genResult()
+	function resolve(): ?string{
+		$ok = $this->createTask();
+		if(!$ok) return NULL;
 
-		if($this->taskTimeoutElapsed == 0) sleep(3);
-
-		$this->debugMessage('<b>Check task status'.($this->taskTimeoutElapsed?' (repeat)':'').'</b>');
-		$result = $this->call('getTaskResult', ['taskId' => $this->taskId]);
-		if(!$result) return $result;
-
-		$timeElapsed = time() - $timeStart;
-
-		switch($result->status){
-			case '0':
-			case 'processing':
-				if($timeElapsed < 3){
-					$this->debugMessage('Waiting 3 seconds');
-
-					sleep(3);
-					$timeElapsed += 3;
-				}
-
-				$this->taskTimeoutElapsed += $timeElapsed;
-
-				if($this->taskTimeoutElapsed > $this->taskTimeout){
-					$this->setErrorMessage("Timeout exceeded: $this->taskTimeoutElapsed secs");
-
-					return NULL;
-				}
-
-				return $this->waitForResult();
-
-			case '1':
-			case 'ready':
-				$this->debugMessage('Task complete');
-
-				return $result;
-			default:
-				$this->setErrorMessage('Expected task status: "processing" (0) or "ready" (1): '.$result->status);
-
-				return NULL;
-		}
+		return $this->waitForResult();
 	}
 
 	function getBalance(): ?float{
 		$this->debugMessage('<b>Get balance</b>');
 
-		$result = $this->call('getBalance');
-		if(!$result) return $result;
-
-		return $result->response;
+		return $this->call('getBalance');
 	}
 
 	function getAppStats(): ?\stdClass{
@@ -172,25 +121,35 @@ class Uncaptcha{
 		return $this->call("getcmstatus?key=$this->clientKey");
 	}
 
-	function reportBad(){
+	function reportBad(): ?bool{
 		if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
-		if($this->v == 1) return $this->call('reportbad', ['id' => $this->taskId]);
+		if($this->v == 1) return (bool)$this->call("reportbad&id=$this->taskId");
 
 		// обработка v2 должна происходить внутри соответствующих классов
 		if($this->v == 2) $this->debugMessage("reportBad: $this->taskId (idle command)");
 	}
 
-	function reportGood(){
+	function reportGood(): ?bool{
 		if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
-		if($this->v == 1) return $this->call('reportgood', ['id' => $this->taskId]);
+		if($this->v == 1) return (bool)$this->call("reportgood&id=$this->taskId");
 
 		// обработка v2 должна происходить внутри соответствующих классов
 		if($this->v == 2) $this->debugMessage("reportGood: $this->taskId (idle command)");
 	}
 
-	protected function genTaskPost(array $post = []): array{
+	private function createTask(): bool{
+		$this->taskId = 0;
+		$this->taskTimeoutElapsed = 0;
+
+		$this->debugMessage('<b>Create task</b>');
+		$this->taskId = (int)$this->call('createTask', ['task' => $this->genCreateTaskPost()]);
+
+		return (bool)$this->taskId;
+	}
+
+	protected function genCreateTaskPost(array $post = []): array{
 		if($this->v == 1){
 			if($this->proxy['server']){
 				$post['proxytype'] = $this->proxy['type'];
@@ -224,6 +183,50 @@ class Uncaptcha{
 		foreach($this->post as $name => $value) $this->post[$name] = $value;
 
 		return $post;
+	}
+
+	private function waitForResult(): bool{
+		$timeStart = time();
+
+		if($this->taskTimeoutElapsed == 0) sleep(3);
+
+		$this->debugMessage('<b>Check task status'.($this->taskTimeoutElapsed?' (repeat)':'').'</b>');
+		$response = $this->call('getTaskResult', ['taskId' => $this->taskId]);
+		if(!$response) return false;
+
+		$timeElapsed = time() - $timeStart;
+
+		$result = $this->getResult();
+		switch($result->status){
+			case '0':
+			case 'processing':
+				if($timeElapsed < 3){
+					$this->debugMessage('Waiting 3 seconds');
+
+					sleep(3);
+					$timeElapsed += 3;
+				}
+
+				$this->taskTimeoutElapsed += $timeElapsed;
+
+				if($this->taskTimeoutElapsed > $this->taskTimeout){
+					$this->setErrorMessage("Timeout exceeded: $this->taskTimeoutElapsed secs");
+
+					return false;
+				}
+
+				return $this->waitForResult();
+
+			case '1':
+			case 'ready':
+				$this->debugMessage('<b>Task complete</b>');
+
+				return true;
+			default:
+				$this->setErrorMessage('Expected task status: "processing" (0) or "ready" (1): '.$result->status);
+
+				return false;
+		}
 	}
 
 }

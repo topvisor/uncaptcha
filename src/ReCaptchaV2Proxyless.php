@@ -9,7 +9,7 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 	protected $websiteS;
 	protected $isInvisible = false;
 
-	function genTaskPost(array $post = []): array{
+	function genCreateTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [
@@ -37,7 +37,7 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 				break;
 		}
 
-		return parent::genTaskPost($post);
+		return parent::genCreateTaskPost($post);
 	}
 
 	function setWebsiteURL(string $websiteUrl): void{
@@ -66,13 +66,13 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 		$this->cookies = $cookies;
 	}
 
-	function reportBad(){
+	function reportBad(): ?bool{
 		if($this->v == 1) return parent::reportBad();
 
 		if($this->v == 2){
 			if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
-			return $this->call('reportIncorrectRecaptcha', ['taskId' => $this->taskId]);
+			return (bool)$this->call('reportIncorrectRecaptcha', ['taskId' => $this->taskId]);
 		}
 	}
 

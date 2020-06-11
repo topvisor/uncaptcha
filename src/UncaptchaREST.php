@@ -7,13 +7,20 @@ trait UncaptchaREST{
 	private $timeout = 10;
 	private $curlResponse = NULL;
 	private $curlErrorMessage = NULL;
-	private $curlResult = NULL; // формат объекта см. в genResult()
+	private $result = NULL; // формат объекта см. в genResult()
 
 	function setTimeout(int $timeout): void{
 		$this->timeout = $timeout;
 	}
 
-	protected function call(string $methodName, array $post = []): ?\stdClass{
+	function getResult(): ?\stdClass{
+		return $this->result;
+	}
+
+	// set $this->result
+	// on success return $this->result->response
+	// on error return NULL
+	protected function call(string $methodName, array $post = []): ?string{
 		if(!$this->host) throw new Exception('Please, set host');
 
 		$url = "$this->scheme://$this->host";
@@ -55,25 +62,23 @@ trait UncaptchaREST{
 
 		$this->debugMessage("'$this->curlResponse'");
 
-		$this->curlResult = $this->genResult($this->curlResponse);
-		if($this->curlResult->errorId){
-			$this->setErrorMessage($this->curlResult->errorDescription.' ('.$this->curlResult->errorCode.')'.' ['.$this->curlResult->errorId.']');
+		$this->result = $this->genResult($this->curlResponse);
+		if($this->result->errorId){
+			$this->setErrorMessage($this->result->errorDescription.' ('.$this->result->errorCode.')'.' ['.$this->result->errorId.']');
 		}
 
 		curl_close($ch);
 
 		$this->debugMessage('=================');
 
-		if($this->curlResult->errorId) return NULL;
+		if($this->result->errorId) return NULL;
 
-		return $this->curlResult;
+		return $this->result->response;
 	}
 
 	private function prepareRequest($methodName, &$_url, &$_post){
 		if($this->v == 1){
 			switch($methodName){
-				case 'getTest':
-					$_url .= 'res.php?';
 				case 'createTask':
 					$_url .= '/in.php?';
 
@@ -81,7 +86,7 @@ trait UncaptchaREST{
 
 					break;
 				case 'getTaskResult':
-					$_url .= '/res.php?action=get2';
+					$_url .= '/res.php?action=get';
 
 					$_post['id'] = $_post['taskId'];
 					unset($_post['taskId']);
@@ -95,7 +100,7 @@ trait UncaptchaREST{
 					$_url .= "/res.php?action=$methodName";
 			}
 
-			$_url .= "&key=$this->clientKey&json=0";
+			$_url .= "&key=$this->clientKey&json=1";
 		}else{
 			$_url .= "/$methodName";
 
@@ -112,7 +117,7 @@ trait UncaptchaREST{
 	private function genResult(string $response): \stdClass{
 		$result = json_decode($response);
 
-		if(!$result) $result = new \stdClass();
+		if(!$result or !is_object($result)) $result = new \stdClass();
 
 		if(!isset($result->response)) $result->response = NULL;
 		if(!isset($result->status)) $result->status = NULL;
@@ -124,6 +129,29 @@ trait UncaptchaREST{
 
 		if($this->v == 1){
 			$result->response = $result->request??NULL; // похоже на опечатку в v=1
+			unset($result->request);
+
+			// если json=1 не поддерживается, то вернется plain text в формате "result" или "status|result"
+			if(!$result->response and !$result->errorId){
+				if(count(explode('|', $response)) == 1){
+					$result->response = $response;
+
+					if($result->response == 'CAPCHA_NOT_READY'){
+						$result->status = '0';
+						$result->response = $response;
+					}
+
+					if($result->response == 'OK_REPORT_RECORDED'){
+						$result->status = '1';
+						$result->response = $response;
+					}
+				}
+
+				if(count(explode('|', $response)) >= 2){
+					$result->status = (explode('|', $response)[0] == 'OK')?'1':'0';
+					$result->response = explode('|', $response)[1];
+				}
+			}
 
 			if($result->response){
 				if(strpos($result->response, 'ERROR_') !== false){
@@ -135,19 +163,6 @@ trait UncaptchaREST{
 				}
 
 				if(isset($result->error_text)) $result->errorDescription = $result->error_text;
-			}
-
-			// если json=1 не поддерживается, то вернется plain text в формате status|result
-			if(!$result->response and !$result->errorId){
-				if(count(explode('|', $response)) >= 2){
-					$result->status = (explode('|', $response)[0] == 'OK')?'1':'0';
-					$result->response = explode('|', $response)[1];
-				}
-
-				if($response == 'CAPCHA_NOT_READY'){
-					$result->status = '0';
-					$result->response = 'CAPCHA_NOT_READY';
-				}
 			}
 		}
 

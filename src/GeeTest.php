@@ -6,7 +6,7 @@ class GeeTest extends GeeTestProxyless{
 
 	use ProxySupportTrait;
 
-	function genTaskPost(array $post = []): array{
+	function genCreateTaskPost(array $post = []): array{
 		$post = [
 			'type' => 'GeeTestTask',
 			'websiteURL' => $this->websiteUrl,
@@ -15,7 +15,7 @@ class GeeTest extends GeeTestProxyless{
 			'challenge' => $this->websiteChallenge
 		];
 
-		return parent::genTaskPost($post);
+		return parent::genCreateTaskPost($post);
 	}
 
 }

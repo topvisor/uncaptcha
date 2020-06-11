@@ -10,7 +10,7 @@ class FunCaptchaProxyless extends Uncaptcha{
 	protected $jsSubdomain;
 	protected $data = [];
 
-	function genTaskPost(array $post = []): array{
+	function genCreateTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [
@@ -38,7 +38,7 @@ class FunCaptchaProxyless extends Uncaptcha{
 				break;
 		}
 
-		return parent::genTaskPost($post);
+		return parent::genCreateTaskPost($post);
 	}
 
 	function setWebsiteURL(string $websiteUrl): void{

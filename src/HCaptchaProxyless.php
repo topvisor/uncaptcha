@@ -7,7 +7,7 @@ class HCaptchaProxyless extends Uncaptcha{
 	protected $websiteUrl;
 	protected $websiteKey;
 
-	function genTaskPost(array $post = []): array{
+	function genCreateTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [
@@ -30,7 +30,7 @@ class HCaptchaProxyless extends Uncaptcha{
 				break;
 		}
 
-		return parent::genTaskPost($post);
+		return parent::genCreateTaskPost($post);
 	}
 
 	function setWebsiteURL($websiteUrl): void{

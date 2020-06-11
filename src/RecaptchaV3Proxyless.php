@@ -9,7 +9,7 @@ class RecaptchaV3Proxyless extends Uncaptcha{
 	protected $pageAction;
 	protected $minScore;
 
-	function genTaskPost(array $post = []): array{
+	function genCreateTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [
@@ -39,7 +39,7 @@ class RecaptchaV3Proxyless extends Uncaptcha{
 				break;
 		}
 
-		return parent::genTaskPost($post);
+		return parent::genCreateTaskPost($post);
 	}
 
 	function setWebsiteURL(string $value): void{
