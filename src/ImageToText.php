@@ -66,27 +66,27 @@ class ImageToText extends Uncaptcha{
 		return (bool)$this->body;
 	}
 
-	function setPhraseFlag(bool $phrase): void{
+	function setPhrase(bool $phrase): void{
 		$this->phrase = $phrase;
 	}
 
-	function setCaseFlag(bool $case): void{
+	function setCase(bool $case): void{
 		$this->case = $case;
 	}
 
-	function setNumericFlag(int $numeric): void{
+	function setNumeric(int $numeric): void{
 		$this->numeric = $numeric;
 	}
 
-	function setMathFlag(bool $value): void{
+	function setMath(bool $value): void{
 		$this->math = $value;
 	}
 
-	function setMinLengthFlag(int $minLength): void{
+	function setMinLength(int $minLength): void{
 		$this->minLength = $minLength;
 	}
 
-	function setMaxLengthFlag(int $maxLength): void{
+	function setMaxLength(int $maxLength): void{
 		$this->maxLength = $maxLength;
 	}
 
