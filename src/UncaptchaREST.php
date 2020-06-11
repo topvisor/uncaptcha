@@ -27,28 +27,22 @@ trait UncaptchaREST{
 
 		$this->prepareRequest($methodName, $url, $post);
 
-		$postJson = json_encode($post, JSON_PRETTY_PRINT);
+		if($this->v == 1) $postFormatted = http_build_query($post);
+		if($this->v == 2) $postFormatted = json_encode($post, JSON_PRETTY_PRINT);
 
 		$this->debugLog('', 2);
 		$this->debugLog("================= $url =================", 2);
-		$this->debugLog($postJson, 2);
+		$this->debugLog($postFormatted, 2);
 
 		$ch = curl_init();
 
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $postJson);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postFormatted);
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
-		$headers = [
-			'Content-Type: application/json; charset=utf-8',
-			'Accept: application/json',
-			'Upgrade-Insecure-Requests: 1',
-			'Content-Length: '.strlen($postJson)
-		];
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
-		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
+		if($this->v == 2) curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json; charset=utf-8']);
 
 		$this->curlResponse = curl_exec($ch);
 
@@ -96,9 +90,9 @@ trait UncaptchaREST{
 					$_url .= '&'.http_build_query($_post);
 
 					break;
-
-					break;
 				default:
+					$methodName = strtolower($methodName);
+
 					$_url .= "/res.php?action=$methodName";
 			}
 
