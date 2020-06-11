@@ -120,6 +120,7 @@ class Uncaptcha{
 		$timeElapsed = time() - $timeStart;
 
 		switch($result->status){
+			case '0':
 			case 'processing':
 				if($timeElapsed < 3){
 					$this->debugMessage('Waiting 3 seconds');
@@ -138,14 +139,15 @@ class Uncaptcha{
 
 				return $this->waitForResult();
 
+			case '1':
 			case 'ready':
 				$this->debugMessage('Task complete');
 
-				return true;
+				return $result;
 			default:
-				$this->setErrorMessage('Expected task status: "processing" or "ready": '.$result->status);
+				$this->setErrorMessage('Expected task status: "processing" (0) or "ready" (1): '.$result->status);
 
-				return false;
+				return NULL;
 		}
 	}
 
