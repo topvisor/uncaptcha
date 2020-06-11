@@ -46,25 +46,25 @@ include_once('%PATH_TO_COMPOSER%/vendor/autoload.php');
 // create an object based on the ImageToText module - recognition of text captcha
 $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 
-$uncaptcha->setTimeout (20); // connection timeout
-$uncaptcha->setTaskTimeout (240); // captcha solving timeout
-$uncaptcha->setDebugLevel (1); // 0 - no log, 1 - short log, 2 - full log
+$uncaptcha->setTimeout(20); // connection timeout
+$uncaptcha->setTaskTimeout(240); // captcha solving timeout
+$uncaptcha->setDebugLevel(1); // 0 - no log, 1 - short log, 2 - full log
 
-$uncaptcha->setDebugLabel ('rc');
-$uncaptcha->setUseHTTPS (true);
-$uncaptcha->setHost ('rucaptcha.com');
-$uncaptcha->setV (1); // in.php / res.php style
-$uncaptcha->setKey ('%API_KEY%');
+$uncaptcha->setDebugLabel('rc');
+$uncaptcha->setUseHTTPS(true);
+$uncaptcha->setHost('rucaptcha.com');
+$uncaptcha->setV(1); // in.php / res.php style
+$uncaptcha->setKey('%API_KEY%');
 
-$uncaptcha->setBodyFromFile ('%URL_IMAGE%');
+$uncaptcha->setBodyFromFile('%URL_IMAGE%');
 
 $result = $uncaptcha->resolve();
-if (! $result) {
-echo 'Error capturing the captcha:'. $uncaptcha->getErrorMessage();
-exit();
+if(!$result) {
+	echo 'Error capturing the captcha:'.$uncaptcha->getErrorMessage();
+	exit();
 }
 
-echo 'Captcha solved: "'. $result. '" for'. $uncaptcha->getTaskElapsed(). ' sec. ';
+echo 'Captcha solved: "'.$result.'" for'.$uncaptcha->getTaskElapsed().' sec.';
 
 ```
 
