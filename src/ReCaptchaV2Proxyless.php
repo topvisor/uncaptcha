@@ -17,7 +17,7 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 					'pageurl' => $this->websiteUrl,
 					'googlekey' => $this->websiteKey,
 					'datas' => $this->websiteS,
-					'invisible' => (int)$this->invisible
+					'invisible' => (int)$this->isInvisible
 				];
 
 				break;
@@ -29,7 +29,7 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 					'websiteKey' => $this->websiteKey,
 //					'websiteSToken' => $this->websiteS,
 					'recaptchaDataSValue' => $this->websiteS,
-					'isInvisible' => $this->invisible
+					'isInvisible' => $this->isInvisible
 				];
 
 				if(get_class($this) == 'ReCaptchaV2') $post['type'] = 'NoCaptchaTask';
