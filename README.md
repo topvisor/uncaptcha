@@ -61,7 +61,7 @@ $uncaptcha->setBodyFromFile('%URL_IMAGE%');
 $result = $uncaptcha->resolve();
 if(!$result){
 	echo 'Ошибка разгадывания капчи: '.$uncaptcha->getErrorMessage();
-	exit();
+	return;
 }
 
 echo 'Капча разгадана: "'.$result.'" за '.$uncaptcha->getTaskElapsed().' сек.';
