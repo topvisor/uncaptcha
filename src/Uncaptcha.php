@@ -23,7 +23,6 @@ class Uncaptcha{
 	protected $host = '';
 	private $clientKey = NULL;
 	protected $v = NULL;
-	protected $post = [];
 	protected $proxy = [
 		'type' => 'http',
 		'server' => NULL,
@@ -33,8 +32,9 @@ class Uncaptcha{
 	];
 	protected $userAgent = NULL;
 	protected $cookies = NULL;
-	protected $taskId = NULL;
+	protected $createTaskPost = [];
 	private $taskTimeout = 240;
+	protected $taskId = NULL;
 	private $taskElapsed = 0;
 	private $errorMessage = '';
 	private $isCLI = NULL;
@@ -51,7 +51,7 @@ class Uncaptcha{
 		$this->scheme = $useHTTPS?'https':'http';
 	}
 
-	function setHost($host){
+	function setHost(string $host){
 		$this->host = $host;
 
 		switch($host){
@@ -77,12 +77,16 @@ class Uncaptcha{
 		$this->clientKey = $clientKey;
 	}
 
-	function setPost(array $post): void{
-		$this->post = $post;
+	function setCreateTaskPost(array $createTaskPost): void{
+		$this->createTaskPost = $createTaskPost;
 	}
 
 	function setTaskTimeout(int $timeout): void{
 		$this->taskTimeout = $timeout;
+	}
+
+	function getTaskid(): ?string{
+		return $this->taskId;
 	}
 
 	function getTaskElapsed(): int{
@@ -97,10 +101,6 @@ class Uncaptcha{
 		$this->errorMessage = $message;
 
 		$this->debugLog($message, 2);
-	}
-
-	function getTaskid(): ?string{
-		return $this->taskId;
 	}
 
 	// return result object with additional property "taskId"
@@ -219,7 +219,7 @@ class Uncaptcha{
 
 		if($this->cookies) $post['cookies'] = $this->cookies;
 
-		foreach($this->post as $name => $value) $this->post[$name] = $value;
+		foreach($this->createTaskPost as $name => $value) $post[$name] = $value;
 
 		return $post;
 	}
