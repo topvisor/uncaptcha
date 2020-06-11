@@ -135,7 +135,10 @@ class Uncaptcha{
 	function getBalance(): ?float{
 		$this->debugLog('<b>Get balance</b>');
 
-		return $this->call('getBalance');
+		$response = $this->call('getBalance');
+		$this->debugLog("- response: $response");
+
+		return $response;
 	}
 
 	function getAppStats(): ?\stdClass{
@@ -160,7 +163,7 @@ class Uncaptcha{
 		}
 
 		// processing v2 must do in Module Class
-		if($this->v == 2) return (bool)$this->debugLog("reportBad: $this->taskId (idle command)");
+		if($this->v == 2) return (bool)$this->debugLog("reportBad: $this->taskId (idle command)", 2);
 	}
 
 	function reportGood(): ?bool{
@@ -173,7 +176,7 @@ class Uncaptcha{
 		}
 
 		// processing v2 must do in module Class
-		if($this->v == 2) return (bool)$this->debugLog("reportGood: $this->taskId (idle command)");
+		if($this->v == 2) return (bool)$this->debugLog("reportGood: $this->taskId (idle command)", 2);
 	}
 
 	private function createTask(): bool{

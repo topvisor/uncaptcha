@@ -33,7 +33,7 @@ class GeeTestProxyless extends Uncaptcha{
 					'geetestApiServerSubdomain' => $this->geetestApiServerSubdomain
 				];
 
-				if(get_class($this) == 'GeeTest') $post['type'] = 'GeeTestTask';
+				if(get_class($this) == 'Topvisor\Uncaptcha\GeeTest') $post['type'] = 'GeeTestTask';
 
 				break;
 		}

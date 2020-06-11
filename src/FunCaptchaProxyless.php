@@ -33,7 +33,7 @@ class FunCaptchaProxyless extends Uncaptcha{
 					'data' => json_encode($this->data)
 				];
 
-				if(get_class($this) == 'FunCaptcha') $post['type'] = 'FunCaptchaTask';
+				if(get_class($this) == 'Topvisor\Uncaptcha\FunCaptcha') $post['type'] = 'FunCaptchaTask';
 
 				break;
 		}

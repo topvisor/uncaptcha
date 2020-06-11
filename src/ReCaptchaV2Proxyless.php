@@ -32,7 +32,7 @@ class ReCaptchaV2Proxyless extends Uncaptcha{
 					'isInvisible' => $this->isInvisible
 				];
 
-				if(get_class($this) == 'ReCaptchaV2') $post['type'] = 'NoCaptchaTask';
+				if(get_class($this) == 'Topvisor\Uncaptcha\ReCaptchaV2') $post['type'] = 'NoCaptchaTask';
 
 				break;
 		}

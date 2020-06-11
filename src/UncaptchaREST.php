@@ -167,6 +167,12 @@ trait UncaptchaREST{
 
 				if(isset($result->error_text)) $result->errorDescription = $result->error_text;
 			}
+
+			if(!$result->errorId and isset($result->error_text)){
+				$result->errorId = 1;
+				$result->errorCode = $result->response;
+				$result->errorDescription = $result->error_text;
+			}
 		}
 
 		if($this->v == 2){

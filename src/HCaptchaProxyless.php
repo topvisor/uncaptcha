@@ -25,7 +25,7 @@ class HCaptchaProxyless extends Uncaptcha{
 					'websiteKey' => $this->websiteKey
 				];
 
-				if(get_class($this) == 'HCaptcha') $post['type'] = 'HCaptchaTask';
+				if(get_class($this) == 'Topvisor\Uncaptcha\HCaptcha') $post['type'] = 'HCaptchaTask';
 
 				break;
 		}
