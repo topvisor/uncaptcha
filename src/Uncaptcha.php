@@ -150,13 +150,6 @@ class Uncaptcha{
 		}
 	}
 
-	function getTest(): ?float{
-		$result = $this->call('test');
-		if(!$result) return $result;
-
-		return $result->response;
-	}
-
 	function getBalance(): ?float{
 		$result = $this->call('getBalance');
 		if(!$result) return $result;
@@ -206,7 +199,6 @@ class Uncaptcha{
 
 			if($this->userAgent) $post['UserAgent'] = $this->userAgent;
 
-			$postdata['json'] = 1;
 			$postdata['soft_id'] = $this->referalId;
 		}
 

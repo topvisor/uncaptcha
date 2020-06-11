@@ -21,22 +21,22 @@ trait UncaptchaREST{
 		if($this->v == 1){
 			switch($methodName){
 				case 'getTest':
-					$url .= 'res.php';
+					$url .= 'res.php?';
 				case 'createTask':
-					$url .= '/in.php';
+					$url .= '/in.php?';
 
 					break;
 				case 'getTaskResult':
-					$url .= 'res.php?action=get';
+					$url .= '/res.php?action=get';
 
 					break;
 
 					break;
 				default:
-					$url .= "res.php?action=$methodName";
+					$url .= "/res.php?action=$methodName";
 			}
 
-			$post['key'] = $this->clientKey;
+			$url .= "&key=$this->clientKey&json=1";
 		}else{
 			$url .= "/$methodName";
 
@@ -73,7 +73,7 @@ trait UncaptchaREST{
 		if($this->curlErrorMessage){
 			$this->curlErrorMessage .= ' ('.curl_errno($ch).')';
 
-			$this->debugMessage($this->curlErrorMessage);
+			$this->debugMessage("Curl: $this->curlErrorMessage");
 		}
 
 		$this->debugMessage("'$this->curlResponse'");
@@ -122,8 +122,6 @@ trait UncaptchaREST{
 
 			// если json=1 не поддерживается, то вернется plain text в формате status|result
 			if(!$result->response and !$result->errorId){
-				if(!$response) $response = '|';
-
 				if(count(explode('|', $response)) == 2){
 					$result->status = (explode('|', $response)[0] == 'OK')?'ready':'processing';
 					$result->response = explode('|', $response)[1];
@@ -155,7 +153,10 @@ trait UncaptchaREST{
 
 			$result->errorDescription = @iconv('utf-8', 'utf-8', $response);
 			if(!$result->errorDescription) $result->errorDescription = @iconv('windows-1251', 'utf-8', $response);
-			if(!$result->errorDescription) $result->errorDescription = $this->curlErrorMessage;
+			if(!$result->errorDescription and $this->curlErrorMessage){
+				$result->errorDescription = $this->curlErrorMessage;
+				$result->errorCode = 'ERROR_CURL';
+			}
 			if(!$result->errorDescription) $result->errorDescription = 'Empty document';
 		}
 
