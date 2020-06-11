@@ -124,7 +124,7 @@ Captcha settings
 * setCreateTaskPost (array $createTaskPost) - a random set of query parameters, mainly used to configure the Custom module
 * setTaskTimeout (int $timeout) - timeout for solving captcha, default is 240 seconds
 
-Unbuttoning process
+Resolving process
 * **resolve()** - start solving, if successful, will return the result
 * getTaskid() - get the task id, the id is created at the beginning of solving, see resolve()
 * getTaskElapsed() - get the time taken to solve the captcha
