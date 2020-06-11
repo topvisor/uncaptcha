@@ -31,23 +31,22 @@ trait UncaptchaREST{
 
 		$this->debugLog('', 2);
 		$this->debugLog("================= $url =================", 2);
-		$this->debugLog($json, 2);
+		$this->debugLog($postJson, 2);
 
 		$ch = curl_init();
+
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-		curl_setopt($ch, CURLOPT_POST, $json);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
-
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postJson);
+		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 		$headers = [
 			'Content-Type: application/json; charset=utf-8',
 			'Accept: application/json',
 			'Upgrade-Insecure-Requests: 1',
-			'Content-Length: '.strlen($json)
+			'Content-Length: '.strlen($postJson)
 		];
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
 		curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 
