@@ -128,7 +128,6 @@ class Uncaptcha{
 		$this->debugLog("===== /$label =====");
 
 		if(!$ok) return NULL;
-		vd($this->getResult());
 
 		return $this->getResult()->response;
 	}
