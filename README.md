@@ -109,6 +109,7 @@ $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 
 Базовые методы доступны для всех модулей
 
+Настройки сервиса
 * setReferalId(string $referalId) - код referalId может испоьзвоаться в некоторых сервисах
 * setUseHTTPS(bool $useHTTPS) - использовать https
 * **setHost(string $host)** - хост сервиса для распознавания
@@ -116,16 +117,15 @@ $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 	* 1: API style: $host/in.php / simplesite.com/res.php?action=%methodName%
 	* 2: API style: $host/%methodName%
 * **setKey(string $clientKey)** - ваш API ключ к сервису
-* setCreateTaskPost(array $createTaskPost) - проивзольный набор параметров запроса,
-	в основном используется для настройки модуля Custom
+* setTimeout() - таймаут соединения, по умолчанию 20 секунд
+
+Настройки капчи
+* setCreateTaskPost(array $createTaskPost) - проивзольный набор параметров запроса, в основном используется для настройки модуля Custom
 * setTaskTimeout(int $timeout) - таймаут на разгадывание капчи, по умолчанию 240 секунд
 
-
-* **resolve()** - запустить разгадывание, вернет результат
-* getTaskElapsed() - получить время, затраченное на разгадывание капчи
+Процесс рагазывания
+* **resolve()** - запустить разгадывание, в случае успеза вернет результат
 * getTaskid() - получить id задачи, id создается при начале разгадывания, см. resolve()
+* getTaskElapsed() - получить время, затраченное на разгадывание капчи
 * getErrorMessage() - получить текст последней ошибки
-
-
-* setTimeout() - Таймаут соединения, по умолчанию 20 секунд
 * getResult() - Иногда требуется получить больше информации, чем просто текст с картинки. Этот метод вернет объект с результатом
