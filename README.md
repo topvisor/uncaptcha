@@ -8,6 +8,7 @@ PHP библиотека для разгадывания капч на сайт�
 https://rucaptcha.com/api-rucaptcha.
 
 Поддерживает работу с сервисами следующих вид капч:
+* ImageToText
 * ReCaptcha V2
 * ReCaptcha V2 Invisible
 * ReCaptcha V3
