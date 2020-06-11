@@ -41,22 +41,22 @@ composer.json:
 ```php
 // ImageToText and other recognition modules, see the directory /src/
 
-include_once ('%PATH_TO_COMPOSER%/vendor /autoload.php');
+include_once('%PATH_TO_COMPOSER%/vendor/autoload.php');
 
 // create an object based on the ImageToText module - recognition of text captcha
 $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 
 $uncaptcha->setTimeout (20); // connection timeout
-$uncaptcha->setTaskTimeout (240); // guessing timeout
+$uncaptcha->setTaskTimeout (240); // captcha solving timeout
 $uncaptcha->setDebugLevel (1); // 0 - no log, 1 - short log, 2 - full log
 
 $uncaptcha->setDebugLabel ('rc');
 $uncaptcha->setUseHTTPS (true);
 $uncaptcha->setHost ('rucaptcha.com');
 $uncaptcha->setV (1); // in.php / res.php style
-$uncaptcha->setKey ('% API_KEY%');
+$uncaptcha->setKey ('%API_KEY%');
 
-$uncaptcha->setBodyFromFile ('% URL_IMAGE%');
+$uncaptcha->setBodyFromFile ('%URL_IMAGE%');
 
 $result = $uncaptcha->resolve();
 if (! $result) {
@@ -115,8 +115,8 @@ Service Settings
 * setUseHTTPS (bool $useHTTPS) - use https
 * **setHost (string $host)** - host of the service for recognition
 * **setV (int $v)** - version of the service API, two values ​​are supported:
-* 1: API style: $host / in.php / simplesite.com/res.php?action=%methodName%
-* 2: API style: $host /% methodName%
+* 1: API style: $host/in.php / simplesite.com/res.php?action=%methodName%
+* 2: API style: $host/%methodName%
 * **setKey (string $clientKey)** - your API key to the service
 * setTimeout() - connection timeout, default 20 seconds
 
