@@ -17,12 +17,12 @@ class ImageToText extends Uncaptcha{
 		switch($this->v){
 			case 1:
 				$post = [
-					'type' => 'base64',
-					'body' => str_replace("\n", '', $this->body),
+					'method' => 'base64',
+					'body' => $this->body,
 					'phrase' => (int)$this->phrase,
 					'regsense' => (int)$this->case,
 					'numeric' => $this->numeric,
-					'math' => (bool)$this->math,
+					'calc' => (int)$this->math,
 					'min_len' => $this->minLength,
 					'max_len' => $this->maxLength,
 					'language' => $this->language
@@ -33,7 +33,7 @@ class ImageToText extends Uncaptcha{
 			case 2:
 				$post = [
 					'type' => 'ImageToTextTask',
-					'body' => str_replace("\n", '', $this->body),
+					'body' => $this->body,
 					'phrase' => $this->phrase,
 					'case' => $this->case,
 					'numeric' => $this->numeric,
@@ -45,6 +45,8 @@ class ImageToText extends Uncaptcha{
 				break;
 		}
 
+		$this->debugLog('<img src="data:image/jpeg;base64,'.$this->body.'">');
+
 		return parent::genCreateTaskPost($post);
 	}
 
@@ -53,19 +55,13 @@ class ImageToText extends Uncaptcha{
 	}
 
 	function setBodyFromFile(string $fileName): bool{
-		if(!file_exists($fileName)){
-			$this->setErrorMessage("File $fileName not found");
+		$this->body = base64_encode(file_get_contents($fileName));
 
-			return false;
-		}
-
-		if(filesize($fileName) > 100){
+		if(strlen($this->body) < 100){
 			$this->setErrorMessage("File $fileName too small");
 
 			return false;
 		}
-
-		$this->body = base64_encode(file_get_contents($fileName));
 
 		return (bool)$this->body;
 	}
@@ -101,7 +97,7 @@ class ImageToText extends Uncaptcha{
 	function reportBad(): ?bool{
 		if(
 			$this->v == 1 or
-			md5($this->host) != '0529087a3e61e81284291fdaeec13a48'
+			$this->host != 'api.anti-captcha.com'
 		) return parent::reportBad();
 
 		if($this->v == 2){
