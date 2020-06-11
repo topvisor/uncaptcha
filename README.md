@@ -42,17 +42,18 @@ composer.json:
 
 include_once('%PATH_TO_COMPOSER%/vendor/autoload.php');
 
+// создаем объект на основе модуля ImageToText - распознавание текстовой капчи
 $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 
 $uncaptcha->setTimeout(20); // таймаут соедиения
-$uncaptcha->setTaskTimeout(240); // таймаут распознавания
+$uncaptcha->setTaskTimeout(240); // таймаут разгадывания
 $uncaptcha->setDebugLevel(1); // 0 - без лога, 1 - короткий лог, 2 - полный лог
 
 $uncaptcha->setDebugLabel('rc');
 $uncaptcha->setUseHTTPS(true);
 $uncaptcha->setHost('rucaptcha.com');
 $uncaptcha->setV(1); // in.php / res.php style
-$uncaptcha->setKey('ab67bdd53139c02b7e343819881f0c0a');
+$uncaptcha->setKey('%API_KEY%');
 
 $uncaptcha->setBodyFromFile('%URL_IMAGE%');
 
@@ -67,15 +68,59 @@ echo 'Капча разгадана: "'.$result.'" за '.$uncaptcha->getTaskEla
 ```
 
 Логи, полученные в результате разгадывания, будут выведены на экран.
-Дополнительно к ним можно получить доступ через getDebugLog(), например для записи в БД:
+Дополнительно к ним можно получить доступ через $uncaptcha->getDebugLog(), например для записи в БД:
 
 ```php
-$logs = $Uncaptcha->getDebugLog();
+$logs = $uncaptcha->getDebugLog();
 ```
 
-в зависимости от того, принята ли капча сервером, можно отправить уведомление серису:
+В зависимости от того, принята ли капча сервером, можно отправить уведомление серису:
 
 ```php
-// $Uncaptcha->reportGood(); // капча разгадана верно
-// $Uncaptcha->reportGood(); // капча разгадана неверно
+// $uncaptcha->reportGood(); // капча разгадана верно
+// $uncaptcha->reportGood(); // капча разгадана неверно
 ```
+
+# Модули библиотеки
+
+* FunCaptcha
+* FunCaptchaProxyless
+* GeeTest
+* GeeTestProxyless
+* HCaptcha
+* HCaptchaProxyless
+* ImageToText
+* ReCaptchaV2
+* ReCaptchaV2Proxyless
+* RecaptchaV3
+* RecaptchaV3Proxyless
+* Custom - модуль, для проивзольной настройки параметров капчи через $uncaptcha->setPost()
+
+Каждый модуль может содержать различный набор методов для необходимой настройки
+
+Для начала работы с одной из них необходимо создать объекта:
+```php
+$uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
+
+// далее необходимо указать доступ к сервису и опции для разгадывания капчи и запустить разгадывание (см. пример выше)
+```
+
+# Базоые методы
+
+Базовые методы доступные для всех модулей
+
+* $uncaptcha->setReferalId(string $referalId) - код referalId может испоьзвоаться в некоторых сервисах
+* $uncaptcha->setUseHTTPS(bool $useHTTPS) - использовать https
+* *$uncaptcha->setHost(string $host)* - хост сервиса для распознавания
+* *$uncaptcha->setV(int $v)* - версия API сервиса, поддерживаеся два значения:
+** 1: API style: $host/in.php / simplesite.com/res.php?action=%methodName%
+** 2: API style: $host/%methodName%
+* *$uncaptcha->setKey(string $clientKey)* - ваш API ключ к сервису
+* $uncaptcha->setCreateTaskPost(array $createTaskPost) - проивзольный набор параметров запроса, в основном используется для настройки модуля Custom
+* $uncaptcha->setTaskTimeout(int $timeout) - таймаут на разгадывание капчи, по умолчанию 240 секунд
+
+* *$uncaptcha->resolve()* - запустить разгадывание, вернет результат
+* $uncaptcha->getTaskElapsed() - получить время, затраченное на разгадывание капчи
+* $uncaptcha->getTaskid() - получить id задачи, id создается при начале разгадывания, см. $uncaptcha->resolve()
+* $uncaptcha->getErrorMessage() - получить текст последней ошибки
+* $uncaptcha->getResult() - Иногда требуется получить больше информации, чем просто текст с картинки. Этот метод вернет объект с результатом
