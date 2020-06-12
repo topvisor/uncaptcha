@@ -249,6 +249,8 @@ class Uncaptcha{
 		$timeElapsed = time() - $timeStart;
 		$this->taskElapsed += $timeElapsed;
 
+		if($response > 1) $this->debugLog("- wait connection $timeElapsed seconds");
+
 		$result = $this->getResult();
 		switch($result->status){
 			case '0':
@@ -259,7 +261,6 @@ class Uncaptcha{
 					sleep(3);
 					$this->taskElapsed += 3;
 				}
-
 				if($this->taskElapsed > $this->taskTimeout){
 					$this->setErrorMessage("Timeout exceeded: $this->taskElapsed secs");
 
