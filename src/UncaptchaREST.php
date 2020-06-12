@@ -30,7 +30,6 @@ trait UncaptchaREST{
 		if($this->v == 1) $postFormatted = http_build_query($post);
 		if($this->v == 2) $postFormatted = json_encode($post, JSON_PRETTY_PRINT);
 
-		$this->debugLog('', 2);
 		$this->debugLog("================= $url =================", 2);
 		$this->debugLog($postFormatted, 2);
 
@@ -63,6 +62,7 @@ trait UncaptchaREST{
 		curl_close($ch);
 
 		$this->debugLog('=================', 2);
+		$this->debugLog('', 2);
 
 		if($this->result->errorId) return NULL;
 
