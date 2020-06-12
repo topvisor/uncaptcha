@@ -236,6 +236,8 @@ class Uncaptcha{
 
 	private function checkResult(): bool{
 		if($this->taskElapsed == 0){
+			$this->debugLog('- wait 3 seconds');
+
 			sleep(3);
 			$this->taskElapsed += 3;
 		}
