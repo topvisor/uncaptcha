@@ -7,7 +7,7 @@ trait UncaptchaREST{
 	private $timeout = 20;
 	private $curlResponse = NULL;
 	private $curlErrorMessage = NULL;
-	private $result = NULL; // формат объекта см. в genResult()
+	private $result = NULL; // result object, see genResult()
 
 	function setTimeout(int $timeout): void{
 		$this->timeout = $timeout;

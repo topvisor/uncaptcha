@@ -164,27 +164,31 @@ class Uncaptcha{
 	function reportBad(): ?bool{
 		if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
+		$label = $this->genDebugLabel();
+
 		if($this->v == 1){
-			$this->debugLog("reportBad: $this->taskId");
+			$this->debugLog("<b>Captcha reportBad</b>: $label / $this->taskId");
 
 			return (bool)$this->call("reportbad&id=$this->taskId");
 		}
 
 		// processing v2 must do in Module Class
-		if($this->v == 2) return (bool)$this->debugLog("reportBad: $this->taskId (idle command)", 2);
+		if($this->v == 2) return (bool)$this->debugLog("<b>Captcha reportBad</b>: $label / $this->taskId (idle command)", 2);
 	}
 
 	function reportGood(): ?bool{
 		if(!$this->taskId) return (bool)$this->setErrorMessage('Task does not exists');
 
+		$label = $this->genDebugLabel();
+
 		if($this->v == 1){
-			$this->debugLog("reportGood: $this->taskId");
+			$this->debugLog("<b>Captcha reportGood</b>: $label / $this->taskId");
 
 			return (bool)$this->call("reportgood&id=$this->taskId");
 		}
 
 		// processing v2 must do in module Class
-		if($this->v == 2) return (bool)$this->debugLog("reportGood: $this->taskId (idle command)", 2);
+		if($this->v == 2) return (bool)$this->debugLog("<b>Captcha reportGood</b>: $label / $this->taskId (idle command)", 2);
 	}
 
 	private function createTask(): bool{

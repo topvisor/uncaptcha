@@ -48,6 +48,10 @@ trait UncaptchaDebug{
 		echo $message;
 	}
 
+	function cleanDebugLog(): array{
+		return $this->debugLog = [];
+	}
+
 	function getDebugLog(): array{
 		return $this->debugLog;
 	}
