@@ -129,7 +129,7 @@ class Uncaptcha{
 
 		if($ok){
 			$responseForLog = $this->getResult()->response;
-			if(!$this->isCLI and strlen($responseForLog) > 40) $responseForLog = '<i title="'.$responseForLog.'">hoverMe</i>';
+			if($this->debugFormat == 0 and strlen($responseForLog) > 40) $responseForLog = '<i title="'.$responseForLog.'">hoverMe</i>';
 			$this->debugLog("- response: $responseForLog");
 		}else{
 			$this->debugLog('- fail');

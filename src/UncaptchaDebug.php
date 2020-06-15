@@ -5,7 +5,7 @@ namespace Topvisor\Uncaptcha;
 trait UncaptchaDebug{
 
 	private $debugLevel = 0; // 0 - without log, 1 - short log, 2 - detailed log
-	private $debugFormat = 0; // 0 - text, 1 - html
+	private $debugFormat = NULL; // 0 - text, 1 - html
 	private $debugLabel = '';
 	private $debugLog = [];
 
@@ -47,18 +47,18 @@ trait UncaptchaDebug{
 
 		if($this->debugLevel < $debugLevel) return;
 
-		$message .= "\n";
-		$message = preg_replace('~<br\s?/?>~', "\n", $message);
-
-		if($this->isCLI){
+		if($this->debugFormat == 0){
+			$message = preg_replace('~<br\s?/?>~', "\n", $message);
 			$message = strip_tags($message);
-		}else{
-			$message = "<pre>$message</pre>";
 		}
 
 		$this->debugLog[] = $message;
 
-		echo $message;
+		if($this->debugFormat == 0){
+			if(strpos($message, "\n") !== false) $message = "<pre>$message</pre>";
+		}
+
+		echo "<pre>$message \n</pre>";
 	}
 
 }
