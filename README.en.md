@@ -133,6 +133,7 @@ Resolving process
 
 Debug / log
 * setDebugLevel() - 0: without log, 1: short log, 2: detailed log
+* setDebugFormat() - 0: text, 1: html
 * setDebugLabel() - set label for task
 * clearDebugLog() - clear the log
 * getDebugLog() - get array strings of log

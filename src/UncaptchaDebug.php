@@ -5,11 +5,16 @@ namespace Topvisor\Uncaptcha;
 trait UncaptchaDebug{
 
 	private $debugLevel = 0; // 0 - without log, 1 - short log, 2 - detailed log
+	private $debugFormat = ''; // 0 - text, 1 - html
 	private $debugLabel = '';
 	private $debugLog = [];
 
 	function setDebugLevel(int $debugLevel): void{
 		$this->debugLevel = $debugLevel;
+	}
+	
+	function setDebugFormat(int $debugFormat): void{
+		$this->debugFormat = $debugFormat;
 	}
 
 	function setDebugLabel(string $debugLabel): void{
@@ -45,13 +50,13 @@ trait UncaptchaDebug{
 		$message .= "\n";
 		$message = preg_replace('~<br\s?/?>~', "\n", $message);
 
-		$this->debugLog[] = $message;
-
 		if($this->isCLI){
 			$message = strip_tags($message);
 		}else{
 			$message = "<pre>$message</pre>";
 		}
+
+		$this->debugLog[] = $message;
 
 		echo $message;
 	}

@@ -133,6 +133,7 @@ $uncaptcha = new \Topvisor\Uncaptcha\ImageToText();
 
 Отладка / логирование
 * setDebugLevel() - 0: без лога, 1: короткий лог, 2: подробный лог
+* setDebugFormat() - 0: text, 1: html
 * setDebugLabel() - установить название для лога
 * clearDebugLog() - очистить лог
 * getDebugLog() - получить массив строк лога

@@ -41,6 +41,8 @@ class Uncaptcha{
 
 	function __construct(){
 		$this->isCLI = function_exists('cli_set_process_title');
+
+		$this->setDebugFormat($this->isCLI?0:1);
 	}
 
 	function setReferalId(int $referalId): void{
