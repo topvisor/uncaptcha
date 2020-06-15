@@ -130,3 +130,9 @@ Resolving process
 * getTaskElapsed() - get the time taken to solve the captcha
 * getErrorMessage() - get the text of the last error
 * getResult() - sometimes you need to get more information than just the text from the image. This method will return an object with the result
+
+Debug / log
+* setDebugLevel() - 0: without log, 1: short log, 2: detailed log
+* setDebugLabel() - set label for task
+* clearDebugLog() - clear the log
+* getDebugLog() - get array strings of log

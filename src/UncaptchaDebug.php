@@ -4,7 +4,7 @@ namespace Topvisor\Uncaptcha;
 
 trait UncaptchaDebug{
 
-	private $debugLevel = 0; // 0 - without log, 1 - short log, 2 - full log
+	private $debugLevel = 0; // 0 - without log, 1 - short log, 2 - detailed log
 	private $debugLabel = '';
 	private $debugLog = [];
 
@@ -14,6 +14,14 @@ trait UncaptchaDebug{
 
 	function setDebugLabel(string $debugLabel): void{
 		$this->debugLabel = $debugLabel;
+	}
+
+	function clearDebugLog(): array{
+		return $this->debugLog = [];
+	}
+
+	function getDebugLog(): array{
+		return $this->debugLog;
 	}
 
 	private function genDebugLabel(): string{
@@ -46,14 +54,6 @@ trait UncaptchaDebug{
 		}
 
 		echo $message;
-	}
-
-	function cleanDebugLog(): array{
-		return $this->debugLog = [];
-	}
-
-	function getDebugLog(): array{
-		return $this->debugLog;
 	}
 
 }
