@@ -251,7 +251,7 @@ class Uncaptcha{
 		$timeElapsed = time() - $timeStart;
 		$this->taskElapsed += $timeElapsed;
 
-		if($response > 1) $this->debugLog("- wait connection $timeElapsed seconds");
+		if($timeElapsed > 1) $this->debugLog("- wait connection $timeElapsed seconds");
 
 		$result = $this->getResult();
 		switch($result->status){
