@@ -128,6 +128,7 @@ class Uncaptcha{
 		$this->debugLog('- elapsed: '.$this->taskElapsed);
 
 		if($ok){
+			
 			$responseForLog = $this->getResult()->response;
 			if($this->debugFormat == 1 and strlen($responseForLog) > 40) $responseForLog = '<i title="'.$responseForLog.'">hoverMe</i>';
 			$this->debugLog("- response: $responseForLog");
