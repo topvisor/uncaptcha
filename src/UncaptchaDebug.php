@@ -54,7 +54,7 @@ trait UncaptchaDebug{
 
 		$this->debugLog[] = $message;
 
-		if($this->debugFormat == 0){
+		if($this->debugFormat == 1){
 			if(strpos($message, "\n") !== false) $message = "<pre>$message</pre>";
 		}
 
