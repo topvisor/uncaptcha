@@ -175,7 +175,7 @@ class Uncaptcha{
 		}
 
 		// processing v2 must do in Module Class
-		if($this->v == 2) return (bool)$this->debugLog("<b>Captcha reportBad</b>: $label / $this->taskId (idle command)", 2);
+		if($this->v == 2) return (bool)$this->debugLog("<b>Captcha reportBad</b>: $label / $this->taskId (idle command)");
 	}
 
 	function reportGood(): ?bool{
@@ -190,7 +190,7 @@ class Uncaptcha{
 		}
 
 		// processing v2 must do in module Class
-		if($this->v == 2) return (bool)$this->debugLog("<b>Captcha reportGood</b>: $label / $this->taskId (idle command)", 2);
+		if($this->v == 2) return (bool)$this->debugLog("<b>Captcha reportGood</b>: $label / $this->taskId (idle command)");
 	}
 
 	private function createTask(): bool{
