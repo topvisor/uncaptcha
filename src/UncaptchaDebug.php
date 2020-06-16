@@ -52,11 +52,11 @@ trait UncaptchaDebug{
 			$message = strip_tags($message);
 		}
 
-		$this->debugLog[] = $message;
-
 		if($this->debugFormat == 1){
 			if(strpos($message, "\n") !== false) $message = "<pre>$message</pre>";
 		}
+
+		$this->debugLog[] = $message;
 
 		echo "<pre>$message \n</pre>";
 	}
