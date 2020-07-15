@@ -252,6 +252,12 @@ class Uncaptcha{
 
 		$this->debugLog('<b>Check task status'.($this->taskElapsed?' (repeat)':'').'</b>', 2);
 		$response = $this->call('getTaskResult', ['taskId' => $this->taskId]);
+
+		$timeElapsed = time() - $timeStart;
+		$this->taskElapsed += $timeElapsed;
+
+		if($timeElapsed > 1) $this->debugLog("- wait connection $timeElapsed seconds");
+
 		###if(!$response) return false;
 		### cmc 429 error
 		if(!$response){
@@ -259,7 +265,7 @@ class Uncaptcha{
 
 			if($result->errorCode == 429){
 				$result->status = 0;
-				
+
 				$this->debugLog('- wait 10 seconds');
 
 				sleep(10);
@@ -268,11 +274,6 @@ class Uncaptcha{
 				return false;
 			}
 		}
-
-		$timeElapsed = time() - $timeStart;
-		$this->taskElapsed += $timeElapsed;
-
-		if($timeElapsed > 1) $this->debugLog("- wait connection $timeElapsed seconds");
 
 		$result = $this->getResult();
 		switch($result->status){
