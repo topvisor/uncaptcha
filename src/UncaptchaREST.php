@@ -197,6 +197,12 @@ trait UncaptchaREST{
 				$result->errorCode = 'ERROR_CURL';
 			}
 			if(!$result->errorDescription) $result->errorDescription = 'Empty document';
+
+			### cmc 429 error
+			if(strpos($result->errorDescription, '429 Too Many Requests')){
+				$result->errorCode = '429';
+				$result->errorDescription = 'Empty document';
+			}
 		}
 
 		return $result;
