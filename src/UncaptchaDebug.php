@@ -29,7 +29,7 @@ trait UncaptchaDebug{
 		return $this->debugLog;
 	}
 
-	private function genDebugLabel(): string{
+	function genDebugLabel(): string{
 		$label = get_class($this);
 		$label = explode('\\', $label);
 		$label = $label[count($label) - 1];
