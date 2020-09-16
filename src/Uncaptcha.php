@@ -18,25 +18,32 @@ class Uncaptcha{
 
 	const V = '1.3.2';
 
-	private $referalId = NULL;
-	private $scheme = 'https';
-	private $host = '';
+	protected $referalId = NULL;
+	private $scheme = 'http';
+	protected $host = '';
 	private $clientKey = NULL;
-	private $v = NULL;
-	private $post = [];
-	private $proxy = [
+	protected $v = NULL;
+	protected $proxy = [
 		'type' => 'http',
 		'server' => NULL,
 		'port' => NULL,
 		'login' => NULL,
 		'password' => NULL
 	];
-	private $userAgent = NULL;
-	private $cookies = NULL;
-	private $taskId = 0;
+	protected $userAgent = NULL;
+	protected $cookies = NULL;
+	protected $createTaskPost = [];
 	private $taskTimeout = 240;
-	private $taskTimeoutElapsed = 0;
+	protected $taskId = NULL;
+	private $taskElapsed = 0;
 	private $errorMessage = '';
+	private $isCLI = NULL;
+
+	function __construct(){
+		$this->isCLI = function_exists('cli_set_process_title');
+
+		$this->setDebugFormat($this->isCLI?0:1);
+	}
 
 	function setReferalId(int $referalId): void{
 		$this->referalId = $referalId;
@@ -46,23 +53,24 @@ class Uncaptcha{
 		$this->scheme = $useHTTPS?'https':'http';
 	}
 
-	function setHost($host){
+	function setHost(string $host){
 		$this->host = $host;
 
 		switch($host){
 			case 'rucaptcha.com':
-				if(!$this->referalId) $this->referalId = 2708; // referer автора этой библиотеки
+				if(!$this->referalId) $this->referalId = 2708; // referer author
+				$this->v = 1;
 
 				break;
 			case 'api.anti-captcha.com':
-				$v = 2;
+				$this->v = 2;
 
 				break;
 		}
 	}
 
-	// v1 - симуляция API вида simplesite.com/in.php / simplesite.com/res.php
-	// v2 - симуляция API вида api.simplesite.com
+	// v1 - API style: simplesite.com/in.php / simplesite.com/res.php?action=%methodName%
+	// v2 - API style: api.simplesite.com/%methodName%
 	function setV(int $v): void{
 		$this->v = $v;
 	}
@@ -71,152 +79,213 @@ class Uncaptcha{
 		$this->clientKey = $clientKey;
 	}
 
-	function setCookies(string $cookies): void{
-		if($this->v == 2) throw new Exception('This function not allowed for this driver');
-
-		$this->cookies = $cookies;
-	}
-
-	function setPost(array $post): void{
-		$this->post = $post;
+	function setCreateTaskPost(array $createTaskPost): void{
+		$this->createTaskPost = $createTaskPost;
 	}
 
 	function setTaskTimeout(int $timeout): void{
 		$this->taskTimeout = $timeout;
 	}
 
+	function getTaskid(): ?string{
+		return $this->taskId;
+	}
+
+	function getTaskElapsed(): int{
+		return $this->taskElapsed;
+	}
+
+	function getErrorMessage(): string{
+		return $this->errorMessage;
+	}
+
 	protected function setErrorMessage(string $message): void{
 		$this->errorMessage = $message;
 
-		$this->debugMessage($message);
+		$this->debugLog($message);
 	}
 
-	function createTask(): bool{
-		$this->taskId = 0;
-		$this->taskTimeoutElapsed = 0;
+	// return result object with additional property "taskId"
+	// see result object in genResult() fore more information
+	function resolve(): ?string{
+		$label = $this->genDebugLabel();
 
-		$result = $this->call('createTask', ['task' => $this->genTaskPost()]);
-		if(!$result) return false;
+		$this->debugLog('<b>Captcha resolving</b>');
+		$this->debugLog("===== $label =====");
+		$this->debugLog("- $this->host");
+		$this->debugLog('');
 
-		if(!isset($result->taskId)){
-			$this->setErrorMessage('Expected taskId in response');
-			return false;
+		$ok = $this->createTask();
+
+		if($ok){
+			$this->debugLog('- task id: '.$this->taskId);
+			$this->debugLog('');
+
+			$ok = $this->checkResult();
 		}
 
-		$this->taskId = $result->taskId;
+		$this->debugLog('');
+		$this->debugLog('- elapsed: '.$this->taskElapsed);
 
-		return true;
-	}
-
-	function waitForResult(): bool{
-		if($this->taskTimeoutElapsed > $this->taskTimeout){
-			$this->setErrorMessage("Timeout exceeded: $this->taskTimeoutElapsed secs");
-
-			return false;
+		if($ok){
+			$responseForLog = $this->getResult()->response;
+			if($this->debugFormat == 1 and strlen($responseForLog) > 40) $responseForLog = '<i title="'.$responseForLog.'">hoverMe</i>';
+			$this->debugLog("- response: $responseForLog");
+		}else{
+			$this->debugLog('- fail');
 		}
 
-		$timeStart = time();
+		$this->debugLog("===== /$label =====");
 
-		if($this->taskTimeoutElapsed == 0) sleep(3);
+		if(!$ok) return NULL;
 
-		$this->debugMessage('Check task status');
-		$result = $this->call('getTaskResult', ['taskId' => $this->taskId]);
-		if(!$result) return false;
-
-		$timeElapsed = time() - $timeStart;
-
-		switch($result->status){
-			case 'processing':
-				if($timeElapsed < 3){
-					$this->debugMessage('waiting 3 seconds');
-
-					sleep(3);
-					$timeElapsed += 3;
-				}
-
-				$this->taskTimeoutElapsed += $timeElapsed;
-
-				return $this->waitForResult();
-
-			case 'ready':
-				$this->debugMessage('Task complete');
-
-				return true;
-			default:
-				$this->setErrorMessage('Expected task status: "processing" or "ready": '.$result->status);
-
-				return false;
-		}
+		return $this->getResult()->response;
 	}
 
 	function getBalance(): ?float{
-		$result = $this->call('getBalance');
-		if(!$result) return $result;
+		$this->debugLog('<b>Get balance</b>');
 
-		return $result->response;
+		$response = $this->call('getBalance');
+		$this->debugLog("- response: $response");
+
+		return $response;
 	}
 
-	function getAppStats(): ?stdClass{
+	function getAppStats(): ?\stdClass{
+		$this->debugLog('<b>Get app stats</b>');
+
 		return $this->call('getAppStats');
 	}
 
-	function getCMStatus(): ?stdClass{
+	function getCMStatus(): ?\stdClass{
+		$this->debugLog('<b>Get smc stats</b>');
+
 		return $this->call("getcmstatus?key=$this->clientKey");
 	}
 
-	function reportBad(){
-		if(!$this->taskid) throw new Exception('Task does not exists');
+	function reportBad(): ?bool{
+		if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
-		if($this->v == 1) $this->call('reportbad', ['id' => $this->taskid]);
+		$label = $this->genDebugLabel();
 
-		// обработка v2 должна происходить внутри соответствующих классов
-		if($this->v == 2) $this->debugMessage("reportGood: $this->taskid (idle command)");
+		if($this->v == 1){
+			$this->debugLog("<b>Captcha reportBad</b>: $label / $this->taskId");
+
+			return (bool)$this->call("reportbad&id=$this->taskId");
+		}
+
+		// processing v2 must do in Module Class
+		if($this->v == 2) return (bool)$this->debugLog("<b>Captcha reportBad</b>: $label / $this->taskId (idle command)");
 	}
 
-	function reportGood(){
-		if(!$this->taskid) throw new Exception('Task does not exists');
+	function reportGood(): ?bool{
+		if(!$this->taskId) return (bool)$this->setErrorMessage('Task does not exists');
 
-		if($this->v == 1) $this->call('reportgood', ['id' => $this->taskid]);
+		$label = $this->genDebugLabel();
 
-		// обработка v2 должна происходить внутри соответствующих классов
-		if($this->v == 2) $this->debugMessage("reportGood: $this->taskid (idle command)");
+		if($this->v == 1){
+			$this->debugLog("<b>Captcha reportGood</b>: $label / $this->taskId");
+
+			return (bool)$this->call("reportgood&id=$this->taskId");
+		}
+
+		// processing v2 must do in module Class
+		if($this->v == 2) return (bool)$this->debugLog("<b>Captcha reportGood</b>: $label / $this->taskId (idle command)");
 	}
 
-	protected function genTaskPost(array $post = []): array{
+	private function createTask(): bool{
+		$this->taskId = 0;
+		$this->taskElapsed = 0;
+
+		$this->debugLog('<b>Create task</b>', 2);
+		$this->taskId = (int)$this->call('createTask', ['task' => $this->genCreateTaskPost()]);
+
+		return (bool)$this->taskId;
+	}
+
+	protected function genCreateTaskPost(array $post = []): array{
 		if($this->v == 1){
 			if($this->proxy['server']){
 				$post['proxytype'] = $this->proxy['type'];
-				$postdata['proxy'] = '';
+				$post['proxy'] = '';
 				if($this->proxy['login']){
-					$postdata['proxy'] .= $this->proxy['login'];
-					if($this->proxy['password']) $postdata['proxy'] .= ':'.$this->proxy['password'];
-					$postdata['proxy'] .= '@';
+					$post['proxy'] .= $this->proxy['login'];
+					if($this->proxy['password']) $post['proxy'] .= ':'.$this->proxy['password'];
+					$post['proxy'] .= '@';
 				}
-				$postdata['proxy'] .= $this->proxy['server'];
-				$postdata['proxy'] .= ':'.$this->proxy['port'];
+				$post['proxy'] .= $this->proxy['server'];
+				$post['proxy'] .= ':'.$this->proxy['port'];
 			}
 
 			if($this->userAgent) $post['UserAgent'] = $this->userAgent;
-
-			$postdata['json'] = 1;
-			$postdata['soft_id'] = $this->referalId;
+			if($this->referalId) $post['soft_id'] = $this->referalId;
 		}
 
 		if($this->v == 2){
-			 $post['proxyType'] = $this->proxy['type'];
-			if($this->proxy['login']) $post['proxyLogin'] = $this->proxy['login'];
-			if($this->proxy['password']) $post['proxyPassword'] = $this->proxy['password'];
-			if($this->proxy['server']) $post['proxyAddress'] = $this->proxy['server'];
-			if($this->proxy['port']) $post['proxyPort'] = $this->proxy['port'];
+			if($this->proxy['server']){
+				$post['proxyType'] = $this->proxy['type'];
+				if($this->proxy['login']) $post['proxyLogin'] = $this->proxy['login'];
+				if($this->proxy['password']) $post['proxyPassword'] = $this->proxy['password'];
+				if($this->proxy['server']) $post['proxyAddress'] = $this->proxy['server'];
+				if($this->proxy['port']) $post['proxyPort'] = $this->proxy['port'];
+			}
 
 			if($this->userAgent) $post['userAgent'] = $this->userAgent;
 		}
 
 		if($this->cookies) $post['cookies'] = $this->cookies;
 
-		foreach($this->post as $name => $value) $this->post[$name] = $value;
+		foreach($this->createTaskPost as $name => $value) $post[$name] = $value;
 
 		return $post;
+	}
+
+	private function checkResult(): bool{
+		if($this->taskElapsed == 0){
+			$this->debugLog('- wait 3 seconds');
+
+			sleep(3);
+			$this->taskElapsed += 3;
+		}
+
+		$timeStart = time();
+
+		$this->debugLog('<b>Check task status'.($this->taskElapsed?' (repeat)':'').'</b>', 2);
+		$response = $this->call('getTaskResult', ['taskId' => $this->taskId]);
+		if(!$response) return false;
+
+		$timeElapsed = time() - $timeStart;
+		$this->taskElapsed += $timeElapsed;
+
+		if($timeElapsed > 1) $this->debugLog("- wait connection $timeElapsed seconds");
+
+		$result = $this->getResult();
+		switch($result->status){
+			case '0':
+			case 'processing':
+				if($timeElapsed < 3){
+					$this->debugLog('- wait 3 seconds');
+
+					sleep(3);
+					$this->taskElapsed += 3;
+				}
+				if($this->taskElapsed > $this->taskTimeout){
+					$this->setErrorMessage("Timeout exceeded: $this->taskElapsed secs");
+
+					return false;
+				}
+
+				return $this->checkResult();
+
+			case '1':
+			case 'ready':
+
+				return true;
+			default:
+				$this->setErrorMessage('Expected task status: "processing" (0) or "ready" (1): '.$result->status);
+
+				return false;
+		}
 	}
 
 }
