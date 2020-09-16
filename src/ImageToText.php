@@ -13,16 +13,16 @@ class ImageToText extends Uncaptcha{
 	private $maxLength = 0;
 	private $language = 0;
 
-	function genTaskPost(): array{
+	function genCreateTaskPost(array $post = []): array{
 		switch($this->v){
 			case 1:
 				$post = [
-					'type' => 'base64',
-					'body' => str_replace("\n", '', $this->body),
+					'method' => 'base64',
+					'body' => $this->body,
 					'phrase' => (int)$this->phrase,
 					'regsense' => (int)$this->case,
 					'numeric' => $this->numeric,
-					'math' => (bool)$this->math,
+					'calc' => (int)$this->math,
 					'min_len' => $this->minLength,
 					'max_len' => $this->maxLength,
 					'language' => $this->language
@@ -39,7 +39,7 @@ class ImageToText extends Uncaptcha{
 			case 2:
 				$post = [
 					'type' => 'ImageToTextTask',
-					'body' => str_replace("\n", '', $this->body),
+					'body' => $this->body,
 					'phrase' => $this->phrase,
 					'case' => $this->case,
 					'numeric' => $this->numeric,
@@ -51,7 +51,9 @@ class ImageToText extends Uncaptcha{
 				break;
 		}
 
-		return parent::genTaskPost($post);
+		$this->debugLog('<img src="data:image/jpeg;base64,'.$this->body.'">');
+
+		return parent::genCreateTaskPost($post);
 	}
 
 	function setBody(string $base64Data): void{
@@ -59,44 +61,38 @@ class ImageToText extends Uncaptcha{
 	}
 
 	function setBodyFromFile(string $fileName): bool{
-		if(!file_exists($fileName)){
-			$this->setErrorMessage("File $fileName not found");
+		$this->body = base64_encode(file_get_contents($fileName));
 
-			return false;
-		}
-
-		if(filesize($fileName) > 100){
+		if(strlen($this->body) < 100){
 			$this->setErrorMessage("File $fileName too small");
 
 			return false;
 		}
 
-		$this->body = base64_encode(file_get_contents($fileName));
-
 		return (bool)$this->body;
 	}
 
-	function setPhraseFlag(bool $phrase): void{
+	function setPhrase(bool $phrase): void{
 		$this->phrase = $phrase;
 	}
 
-	function setCaseFlag(bool $case): void{
+	function setCase(bool $case): void{
 		$this->case = $case;
 	}
 
-	function setNumericFlag(int $numeric): void{
+	function setNumeric(int $numeric): void{
 		$this->numeric = $numeric;
 	}
 
-	function setMathFlag(bool $value): void{
+	function setMath(bool $value): void{
 		$this->math = $value;
 	}
 
-	function setMinLengthFlag(int $minLength): void{
+	function setMinLength(int $minLength): void{
 		$this->minLength = $minLength;
 	}
 
-	function setMaxLengthFlag(int $maxLength): void{
+	function setMaxLength(int $maxLength): void{
 		$this->maxLength = $maxLength;
 	}
 
@@ -104,13 +100,19 @@ class ImageToText extends Uncaptcha{
 		$this->language = $language;
 	}
 
-	function reportBad(){
-		if($this->v == 1) return parent::reportBad();
+	function reportBad(): ?bool{
+		if(
+			$this->v == 1 or
+			$this->host != 'api.anti-captcha.com'
+		) return parent::reportBad();
 
 		if($this->v == 2){
-			if(!$this->taskid) throw new Exception('Task does not exists');
+			if(!$this->taskId) return $this->setErrorMessage('Task does not exists');
 
-			return $this->call('reportIncorrectImageCaptcha', ['taskId' => $this->taskid]);
+			$label = $this->genDebugLabel();
+			$this->debugLog("<b>Captcha reportBad</b>: $label / $this->taskId");
+
+			return (bool)$this->call('reportIncorrectImageCaptcha', ['taskId' => $this->taskId]);
 		}
 	}
 
