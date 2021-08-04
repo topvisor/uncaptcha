@@ -16,7 +16,7 @@ class Uncaptcha{
 	use UncaptchaREST;
 	use UncaptchaDebug;
 
-	const V = '1.3.6';
+	const V = '1.3.7';
 
 	protected $referalId = NULL;
 	private $scheme = 'http';
