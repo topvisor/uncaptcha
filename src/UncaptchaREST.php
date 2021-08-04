@@ -20,7 +20,7 @@ trait UncaptchaREST{
 	// set $this->result
 	// on success return $this->result->response or $this->result->status
 	// on error return NULL
-	protected function call(string $methodName, array $post = []):{
+	protected function call(string $methodName, array $post = []){
 		if(!$this->host) throw new \Exception('Please, set host');
 
 		$url = "$this->scheme://$this->host";
