@@ -20,7 +20,7 @@ trait UncaptchaREST{
 	// set $this->result
 	// on success return $this->result->response or $this->result->status
 	// on error return NULL
-	protected function call(string $methodName, array $post = []): ?string{
+	protected function call(string $methodName, array $post = []):{
 		if(!$this->host) throw new \Exception('Please, set host');
 
 		$url = "$this->scheme://$this->host";
@@ -54,7 +54,7 @@ trait UncaptchaREST{
 
 		$this->debugLog("'$this->curlResponse'", 2);
 
-		$this->result = $this->genResult($this->curlResponse);
+		$this->result = $this->genResult($this->curlResponse, $methodName);
 		if($this->result->errorId){
 			$this->setErrorMessage('- '.$this->result->errorDescription.' ('.$this->result->errorCode.')'.' ['.$this->result->errorId.']');
 		}
@@ -110,7 +110,7 @@ trait UncaptchaREST{
 		if(isset($_post['cookies'])) $_post['cookies'] = trim($_post['cookies'], '; ');
 	}
 
-	private function genResult(string $response): \stdClass{
+	private function genResult(string $response, string $methodName): \stdClass{
 		$result = json_decode($response);
 
 		if(!$result or !is_object($result)) $result = new \stdClass();
@@ -183,7 +183,7 @@ trait UncaptchaREST{
 
 				if(isset($result->solution->cookies)) $result->cookies = $result->solution->cookies;
 			}
-			
+
 			if(strpos($methodName, 'getcmstatus') === 0) $result->response = json_decode($response);
 		}
 
