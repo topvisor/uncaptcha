@@ -183,6 +183,8 @@ trait UncaptchaREST{
 
 				if(isset($result->solution->cookies)) $result->cookies = $result->solution->cookies;
 			}
+			
+			if(strpos($methodName, 'getcmstatus') === 0) $result->response = json_decode($response);
 		}
 
 		if(!$result->response and !$result->status and !$result->errorId){
