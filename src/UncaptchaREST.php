@@ -2,7 +2,6 @@
 
 namespace Topvisor\Uncaptcha;
 
-
 trait UncaptchaREST{
 
 	private $timeout = 20;
