@@ -56,7 +56,8 @@ trait UncaptchaREST{
 
 		$this->result = $this->genResult($this->curlResponse, $methodName);
 		if($this->result->errorId){
-			$this->setErrorMessage('- '.$this->result->errorDescription.' ('.$this->result->errorCode.')'.' ['.$this->result->errorId.']');
+			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			$this->setErrorMessage('- '.$this->result->errorDescription.' ('.$this->result->errorCode.')'.' ['.$this->result->errorId.'], http code: '.$httpCode);
 		}
 
 		curl_close($ch);
