@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Topvisor\Uncaptcha;
 
 trait UncaptchaREST{
