@@ -1,5 +1,6 @@
 <?php
 
+
 // Поддерживает работу с сервисами следующих вид капч:
 // - ReCaptcha V2
 // - ReCaptcha V2 Invisible
