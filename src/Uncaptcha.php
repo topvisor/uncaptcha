@@ -16,7 +16,7 @@ class Uncaptcha{
 	use UncaptchaREST;
 	use UncaptchaDebug;
 
-	const V = '1.3.9';
+	const V = '1.4.0';
 
 	protected $referalId = NULL;
 	private $scheme = 'http';
@@ -85,6 +85,14 @@ class Uncaptcha{
 
 	function setTaskTimeout(int $timeout): void{
 		$this->taskTimeout = $timeout;
+	}
+
+	function getScheme(): string{
+		return $this->scheme;
+	}
+
+	function getHost(): string{
+		return $this->host;
 	}
 
 	function getTaskid(): ?string{
