@@ -24,7 +24,6 @@ trait UncaptchaREST{
 		if(!$this->host) throw new \Exception('Please, set host');
 
 		$url = "$this->scheme://$this->host";
-//		if(req('debug') && !rand(0, 5)) $url = "$this->scheme://localhost"; ###
 
 		$this->prepareRequest($methodName, $url, $post);
 
