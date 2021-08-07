@@ -33,7 +33,7 @@ class Uncaptcha{
 	protected $userAgent = NULL;
 	protected $cookies = NULL;
 	protected $createTaskPost = [];
-	private $taskTimeout = 240;
+	private $taskTimeout = 300;
 	protected $taskId = NULL;
 	private $taskElapsed = 0;
 	private $errorMessage = '';
@@ -201,6 +201,7 @@ class Uncaptcha{
 		if($this->v == 2) return (bool)$this->debugLog("<b>Captcha reportGood</b>: $label / $this->taskId (idle command)");
 	}
 
+	// создать задачу на решение
 	private function createTask(): bool{
 		$this->taskId = 0;
 		$this->taskElapsed = 0;
@@ -248,6 +249,7 @@ class Uncaptcha{
 		return $post;
 	}
 
+	// получить результат решения задачи
 	private function checkResult(): bool{
 		if($this->taskElapsed == 0){
 			$this->debugLog('- wait 3 seconds');
@@ -259,41 +261,55 @@ class Uncaptcha{
 		$timeStart = time();
 
 		$this->debugLog('<b>Check task status'.($this->taskElapsed?' (repeat)':'').'</b>', 2);
-		$response = $this->call('getTaskResult', ['taskId' => $this->taskId]);
-		if(!$response) return false;
+		$this->call('getTaskResult', ['taskId' => $this->taskId]);
 
 		$timeElapsed = time() - $timeStart;
 		$this->taskElapsed += $timeElapsed;
 
-		if($timeElapsed > 1) $this->debugLog("- wait connection $timeElapsed seconds");
+		if($timeElapsed > 1) $this->debugLog("- delay host response $timeElapsed seconds");
 
 		$result = $this->getResult();
-		switch($result->status){
-			case '0':
-			case 'processing':
-				if($timeElapsed < 3){
-					$this->debugLog('- wait 3 seconds');
 
-					sleep(3);
-					$this->taskElapsed += 3;
-				}
-				if($this->taskElapsed > $this->taskTimeout){
-					$this->setErrorMessage("Timeout exceeded: $this->taskElapsed secs");
+		// ошибки коннекта игнорируются, так как не являются результатом решения задачи
+		if($result->errorCode != 'ERROR_CURL'){
+			// задачу не удалось решить
+			if($result->errorCode) return false;
+
+			switch($result->status){
+				// задача в процессе решения: 0 / processing
+				// задача решена: 1 / ready
+				case 0:
+				case 'processing':
+				case 1:
+				case 'ready':
+					// задача решена
+//					if($result->status === 1 || $result->status === '1' || $result->status === 'ready') return true;
+					if($result->status === 1 || $result->status === 'ready') return true;
+
+					break;
+
+				// неожиданные ответ сервера
+				default:
+					$this->setErrorMessage('Expected task status: "processing" (0) or "ready" (1): '.$result->status);
 
 					return false;
-				}
-
-				return $this->checkResult();
-
-			case '1':
-			case 'ready':
-
-				return true;
-			default:
-				$this->setErrorMessage('Expected task status: "processing" (0) or "ready" (1): '.$result->status);
-
-				return false;
+			}
 		}
+
+		// повтор получения результата
+		if($timeElapsed < 3){
+			$this->debugLog('- wait 3 seconds');
+
+			sleep(3);
+			$this->taskElapsed += 3;
+		}
+		if($this->taskElapsed > $this->taskTimeout){
+			$this->setErrorMessage("Timeout exceeded: $this->taskElapsed secs");
+
+			return false;
+		}
+
+		return $this->checkResult();
 	}
 
 }

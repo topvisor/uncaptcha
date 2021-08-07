@@ -24,6 +24,7 @@ trait UncaptchaREST{
 		if(!$this->host) throw new \Exception('Please, set host');
 
 		$url = "$this->scheme://$this->host";
+//		if(req('debug') && !rand(0, 5)) $url = "$this->scheme://localhost"; ###
 
 		$this->prepareRequest($methodName, $url, $post);
 
@@ -134,18 +135,18 @@ trait UncaptchaREST{
 					$result->response = $response;
 
 					if($result->response == 'CAPCHA_NOT_READY'){
-						$result->status = '0';
+						$result->status = 0;
 						$result->response = $response;
 					}
 
 					if($result->response == 'OK_REPORT_RECORDED'){
-						$result->status = '1';
+						$result->status = 1;
 						$result->response = $response;
 					}
 				}
 
 				if(count(explode('|', $response)) >= 2){
-					$result->status = (explode('|', $response)[0] == 'OK')?'1':'0';
+					$result->status = (explode('|', $response)[0] == 'OK')?1:0;
 					$result->response = explode('|', $response)[1];
 				}
 			}
@@ -154,7 +155,7 @@ trait UncaptchaREST{
 				if(strpos($result->response, 'ERROR_') !== false){
 					$result->errorId = 1;
 					$result->errorCode = $result->response;
-					$result->errorDescription = '';
+					$result->errorDescription = $result->response;
 
 					$result->response = NULL;
 				}
