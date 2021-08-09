@@ -160,7 +160,6 @@ class Uncaptcha{
 		$this->debugLog('<b>Get balance</b>');
 
 		$response = $this->call('getBalance');
-		vd($response);
 		$this->debugLog("- response: $response");
 
 		return $response;
