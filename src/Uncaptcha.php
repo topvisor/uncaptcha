@@ -97,6 +97,10 @@ class Uncaptcha{
 		return $this->host;
 	}
 
+	function getHostIp(): ?string{
+		return $this->hostIp;
+	}
+
 	function getTaskid(): ?string{
 		return $this->taskId;
 	}
@@ -156,6 +160,7 @@ class Uncaptcha{
 		$this->debugLog('<b>Get balance</b>');
 
 		$response = $this->call('getBalance');
+		vd($response);
 		$this->debugLog("- response: $response");
 
 		return $response;
