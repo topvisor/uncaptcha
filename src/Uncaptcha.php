@@ -16,11 +16,12 @@ class Uncaptcha{
 	use UncaptchaREST;
 	use UncaptchaDebug;
 
-	const V = '1.4.0';
+	const V = '1.4.1';
 
 	protected $referalId = NULL;
 	private $scheme = 'http';
 	protected $host = '';
+	private $hostIp = NULL;
 	private $clientKey = NULL;
 	protected $v = NULL;
 	protected $proxy = [
@@ -53,8 +54,9 @@ class Uncaptcha{
 		$this->scheme = $useHTTPS?'https':'http';
 	}
 
-	function setHost(string $host){
+	function setHost(string $host, string $ip = NULL){
 		$this->host = $host;
+		$this->hostIp = $ip;
 
 		switch($host){
 			case 'rucaptcha.com':
@@ -120,7 +122,7 @@ class Uncaptcha{
 
 		$this->debugLog('<b>Captcha resolving</b>');
 		$this->debugLog("===== $label =====");
-		$this->debugLog("- $this->host");
+		$this->debugLog("- $this->host".($this->hostIp?" ($this->hostIp)":''));
 		$this->debugLog('');
 
 		$ok = $this->createTask();

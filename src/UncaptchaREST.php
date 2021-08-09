@@ -24,6 +24,15 @@ trait UncaptchaREST{
 		if(!$this->host) throw new \Exception('Please, set host');
 
 		$url = "$this->scheme://$this->host";
+		if($this->hostIp){
+			$url = "$this->scheme://$this->hostIp";
+			$headers[] = "Host: $this->host";
+		}
+
+		$headers = [];
+		if($this->v == 2) $headers[] = 'Content-Type: application/json; charset=utf-8';
+
+		vd($headers);
 
 		$this->prepareRequest($methodName, $url, $post);
 
@@ -41,7 +50,7 @@ trait UncaptchaREST{
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $postFormatted);
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 		curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
-		if($this->v == 2) curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json; charset=utf-8']);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
 		$this->curlResponse = curl_exec($ch);
 
