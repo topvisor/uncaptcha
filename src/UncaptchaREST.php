@@ -24,12 +24,13 @@ trait UncaptchaREST{
 		if(!$this->host) throw new \Exception('Please, set host');
 
 		$url = "$this->scheme://$this->host";
+		$headers = [];
+
 		if($this->hostIp){
 			$url = "$this->scheme://$this->hostIp";
 			$headers[] = "Host: $this->host";
 		}
 
-		$headers = [];
 		if($this->v == 2) $headers[] = 'Content-Type: application/json; charset=utf-8';
 
 		$this->prepareRequest($methodName, $url, $post);
