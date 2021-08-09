@@ -32,8 +32,6 @@ trait UncaptchaREST{
 		$headers = [];
 		if($this->v == 2) $headers[] = 'Content-Type: application/json; charset=utf-8';
 
-		vd($headers);
-
 		$this->prepareRequest($methodName, $url, $post);
 
 		if($this->v == 1) $postFormatted = http_build_query($post);
