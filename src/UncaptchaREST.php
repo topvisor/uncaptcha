@@ -50,7 +50,7 @@ trait UncaptchaREST{
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip,deflate');
 		curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-		if($this->hostIp) curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		if($this->getHostIp()) curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
 		$this->curlResponse = curl_exec($ch);
 
