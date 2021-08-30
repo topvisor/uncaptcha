@@ -26,8 +26,8 @@ trait UncaptchaREST{
 		$url = "$this->scheme://$this->host";
 		$headers = [];
 
-		if($this->hostIp){
-			$url = "$this->scheme://$this->hostIp";
+		if($this->getHostIp()){
+			$url = "$this->scheme://".$this->getHostIp();
 			$headers[] = "Host: $this->host";
 		}
 
