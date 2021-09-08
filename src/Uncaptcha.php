@@ -213,12 +213,20 @@ class Uncaptcha{
 		$this->taskElapsed = 0;
 
 		$this->debugLog('<b>Create task</b>', 2);
-		$this->taskId = (int)$this->call('createTask', ['task' => $this->genCreateTaskPost()]);
+
+		$taskData = $this->genCreateTaskPost();
+		if(!$taskData){
+			$this->debugLog('- task cannot be created');
+
+			return false;
+		}
+
+		$this->taskId = (int)$this->call('createTask', ['task' => $taskData]);
 
 		return (bool)$this->taskId;
 	}
 
-	protected function genCreateTaskPost(array $post = []): array{
+	protected function genCreateTaskPost(array $post = []): ?array{
 		if($this->v == 1){
 			if($this->proxy['server']){
 				$post['proxytype'] = $this->proxy['type'];

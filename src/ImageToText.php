@@ -13,7 +13,9 @@ class ImageToText extends Uncaptcha{
 	private $maxLength = 0;
 	private $language = 0;
 
-	function genCreateTaskPost(array $post = []): array{
+	function genCreateTaskPost(array $post = []): ?array{
+		if(!$this->body) return NULL;
+
 		switch($this->v){
 			case 1:
 				$post = [
@@ -56,8 +58,16 @@ class ImageToText extends Uncaptcha{
 		return parent::genCreateTaskPost($post);
 	}
 
-	function setBody(string $base64Data): void{
+	function setBody(string $base64Data): bool{
 		$this->body = $base64Data;
+
+		if(strlen($this->body) < 100){
+			$this->setErrorMessage('Size of data too small');
+
+			return false;
+		}
+
+		return (bool)$this->body;
 	}
 
 	function setBodyFromFile(string $fileName): bool{
