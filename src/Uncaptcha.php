@@ -54,7 +54,7 @@ class Uncaptcha{
 		$this->scheme = $useHTTPS?'https':'http';
 	}
 
-	function setHost(string $host, string $ip = NULL){
+	function setHost(string $host, ?string $ip = NULL){
 		$this->host = $host;
 		$this->hostIp = $ip;
 
